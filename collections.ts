@@ -11,6 +11,8 @@ export module collections.immutable {
 
         foldRight<U>(z: U, f: (t: T, acc: U) => U): U;
 
+        foldLeft<U>(z: U, f: (acc: U, t: T) => U): U;
+
         append(l: IList<T>): IList<T>;
     }
 
@@ -47,6 +49,10 @@ export module collections.immutable {
             throw new Error("foldRight of empty list");
         }
 
+        foldLeft<U> (z: U, f: (t: T, acc: U) => U): U {
+            throw new Error("foldLeft of empty list");
+        }
+
         append(l: IList<T>): IList<T> {
             return append1(this, l);
         }
@@ -63,6 +69,14 @@ export module collections.immutable {
             return z;
         } else {
             return f(l.head(), foldRight1<T, U>(l.tail(), z, f))
+        }
+    }
+
+    function foldLeft1<T, U>(l: IList<T>, z: U, f: (acc: U, t: T) => U): U {
+        if(l.isEmpty()) {
+            return z;
+        } else {
+            return foldLeft1(l.tail(), f(z, l.head()), f)
         }
     }
 
@@ -88,6 +102,10 @@ export module collections.immutable {
 
         foldRight<U>(z: U, f: (t: T, acc: U) => U): U {
             return foldRight1(this, z, f)
+        }
+
+        foldLeft<U>(z: U, f: (acc: U, t: T) => U): U {
+            return foldLeft1(this, z, f)
         }
 
         append(l: IList<T>): IList<T> {

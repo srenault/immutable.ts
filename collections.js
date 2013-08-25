@@ -38,6 +38,10 @@ define(["require", "exports"], function(require, exports) {
                     throw new Error("foldRight of empty list");
                 };
 
+                Nil.prototype.foldLeft = function (z, f) {
+                    throw new Error("foldLeft of empty list");
+                };
+
                 Nil.prototype.append = function (l) {
                     return append1(this, l);
                 };
@@ -56,6 +60,14 @@ define(["require", "exports"], function(require, exports) {
                     return z;
                 } else {
                     return f(l.head(), foldRight1(l.tail(), z, f));
+                }
+            }
+
+            function foldLeft1(l, z, f) {
+                if (l.isEmpty()) {
+                    return z;
+                } else {
+                    return foldLeft1(l.tail(), f(z, l.head()), f);
                 }
             }
 
@@ -82,6 +94,10 @@ define(["require", "exports"], function(require, exports) {
 
                 Cons.prototype.foldRight = function (z, f) {
                     return foldRight1(this, z, f);
+                };
+
+                Cons.prototype.foldLeft = function (z, f) {
+                    return foldLeft1(this, z, f);
                 };
 
                 Cons.prototype.append = function (l) {

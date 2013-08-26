@@ -35,11 +35,11 @@ define(["require", "exports"], function(require, exports) {
                 };
 
                 Nil.prototype.foldLeft = function (z, f) {
-                    throw new Error("foldLeft of empty list");
+                    return foldLeft1(this, z, f);
                 };
 
                 Nil.prototype.foldRight = function (z, f) {
-                    throw new Error("foldRight of empty list");
+                    return foldRight1(this, z, f);
                 };
 
                 Nil.prototype.append = function (l) {
@@ -54,6 +54,10 @@ define(["require", "exports"], function(require, exports) {
                     return flatMap1(this, f);
                 };
 
+                Nil.prototype.filter = function (f) {
+                    return filter1(this, f);
+                };
+
                 Nil.prototype.foreach = function (f) {
                     return foreach1(this, f);
                 };
@@ -64,6 +68,10 @@ define(["require", "exports"], function(require, exports) {
 
                 Nil.prototype.asArray = function () {
                     return asArray1(this);
+                };
+
+                Nil.prototype.mkString = function (sep) {
+                    return mkString1(this, sep);
                 };
                 return Nil;
             })();
@@ -105,6 +113,16 @@ define(["require", "exports"], function(require, exports) {
                 return concat1(l.map(f));
             }
 
+            function filter1(l, f) {
+                return l.foldRight(new Nil(), function (t, acc) {
+                    if (f(t)) {
+                        return acc;
+                    } else {
+                        return new Cons(t, acc);
+                    }
+                });
+            }
+
             function foreach1(l, f) {
                 l.foldLeft(new Nil(), function (acc, t) {
                     f(t);
@@ -115,6 +133,15 @@ define(["require", "exports"], function(require, exports) {
             function reverse1(l) {
                 return l.foldLeft(new Nil(), function (acc, t) {
                     return new Cons(t, acc);
+                });
+            }
+
+            function mkString1(l, sep) {
+                return l.foldLeft("", function (acc, t) {
+                    if (acc == "")
+                        return t;
+                    else
+                        return acc + sep + t;
                 });
             }
 
@@ -166,6 +193,10 @@ define(["require", "exports"], function(require, exports) {
                     return flatMap1(this, f);
                 };
 
+                Cons.prototype.filter = function (f) {
+                    return filter1(this, f);
+                };
+
                 Cons.prototype.foreach = function (f) {
                     return foreach1(this, f);
                 };
@@ -176,6 +207,10 @@ define(["require", "exports"], function(require, exports) {
 
                 Cons.prototype.asArray = function () {
                     return asArray1(this);
+                };
+
+                Cons.prototype.mkString = function (sep) {
+                    return mkString1(this, sep);
                 };
                 return Cons;
             })();

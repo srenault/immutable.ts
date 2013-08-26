@@ -19,11 +19,15 @@ export module collections.immutable {
 
         flatMap<U>(f: (t: T) => IList<U>): IList<U>;
 
+        filter(f: (t: T) => boolean): IList<T>;
+
         foreach(f: (t: T) => void): void;
 
         reverse(): IList<T>;
 
         asArray(): T[];
+
+        mkString(sep: string): string;
     }
 
     export function List<T>(...as: T[]): IList<T> {
@@ -55,12 +59,12 @@ export module collections.immutable {
             return 0;
         }
 
-        foldLeft<U> (z: U, f: (t: T, acc: U) => U): U {
-            throw new Error("foldLeft of empty list");
+        foldLeft<U> (z: U, f: (acc: U, t: T) => U): U {
+            return foldLeft1<T, U>(this, z, f);
         }
 
         foldRight<U> (z: U, f: (t: T, acc: U) => U): U {
-            throw new Error("foldRight of empty list");
+            return foldRight1<T, U>(this, z, f);
         }
 
         append(l: IList<T>): IList<T> {
@@ -75,6 +79,10 @@ export module collections.immutable {
             return flatMap1(this, f);
         }
 
+        filter(f: (t: T) => boolean): IList<T> {
+            return filter1(this, f);
+        }
+
         foreach(f: (t: T) => void): void {
             return foreach1(this, f);
         }
@@ -85,6 +93,10 @@ export module collections.immutable {
 
         asArray(): T[] {
             return asArray1(this);
+        }
+
+        mkString(sep: string): string {
+            return mkString1(this, sep);
         }
     }
 
@@ -124,6 +136,16 @@ export module collections.immutable {
         return concat1<U>(l.map<IList<U>>(f));
     }
 
+    function filter1<T>(l: IList<T>, f: (t: T) => boolean): IList<T> {
+        return l.foldRight<IList<T>>(new Nil<T>(), (t, acc) => {
+            if(f(t)) {
+                return acc;
+            } else {
+                return new Cons<T>(t, acc);
+            }
+        });
+    }
+
     function foreach1<T>(l: IList<T>, f: (t: T) => void): void {
         l.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
             f(t);
@@ -134,6 +156,13 @@ export module collections.immutable {
     function reverse1<T>(l: IList<T>): IList<T> {
         return l.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
             return new Cons<T>(t, acc);
+        });
+    }
+
+    function mkString1<T>(l: IList<T>, sep: string): string {
+        return l.foldLeft<string>("", (acc, t) => {
+            if(acc == "") return t;
+            else return acc + sep + t;
         });
     }
 
@@ -184,6 +213,10 @@ export module collections.immutable {
             return flatMap1(this, f);
         }
 
+        filter(f: (t: T) => boolean): IList<T> {
+            return filter1(this, f);
+        }
+
         foreach(f: (t: T) => void): void {
             return foreach1(this, f);
         }
@@ -194,6 +227,10 @@ export module collections.immutable {
 
         asArray(): T[] {
             return asArray1(this);
+        }
+
+        mkString(sep: string): string {
+            return mkString1(this, sep);
         }
     }
 

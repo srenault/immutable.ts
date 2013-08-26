@@ -19,4 +19,6 @@ define(["require", "exports", "collections"], function(require, exports, __ts__)
 
     console.log(l3, l3.length());
     console.log(l4.asArray());
+    console.log(l4.mkString(", "));
+    console.log(List(1, 2).mkString(", "));
 });

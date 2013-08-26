@@ -9,11 +9,21 @@ export module collections.immutable {
 
         length(): number;
 
-        foldRight<U>(z: U, f: (t: T, acc: U) => U): U;
-
         foldLeft<U>(z: U, f: (acc: U, t: T) => U): U;
 
+        foldRight<U>(z: U, f: (t: T, acc: U) => U): U;
+
         append(l: IList<T>): IList<T>;
+
+        map<U>(f: (t: T) => U): IList<U>;
+
+        flatMap<U>(f: (t: T) => IList<U>): IList<U>;
+
+        foreach(f: (t: T) => void): void;
+
+        reverse(): IList<T>;
+
+        asArray(): T[];
     }
 
     export function List<T>(...as: T[]): IList<T> {
@@ -45,16 +55,36 @@ export module collections.immutable {
             return 0;
         }
 
-        foldRight<U> (z: U, f: (t: T, acc: U) => U): U {
-            throw new Error("foldRight of empty list");
-        }
-
         foldLeft<U> (z: U, f: (t: T, acc: U) => U): U {
             throw new Error("foldLeft of empty list");
         }
 
+        foldRight<U> (z: U, f: (t: T, acc: U) => U): U {
+            throw new Error("foldRight of empty list");
+        }
+
         append(l: IList<T>): IList<T> {
             return append1(this, l);
+        }
+
+        map<U>(f: (t: T) => U): IList<U> {
+            return map1(this, f);
+        }
+
+        flatMap<U>(f: (t: T) => IList<U>): IList<U> {
+            return flatMap1(this, f);
+        }
+
+        foreach(f: (t: T) => void): void {
+            return foreach1(this, f);
+        }
+
+        reverse(): IList<T> {
+            return reverse1(this);
+        }
+
+        asArray(): T[] {
+            return asArray1(this);
         }
     }
 
@@ -64,20 +94,54 @@ export module collections.immutable {
         });
     }
 
-    function foldRight1<T, U>(l: IList<T>, z: U, f: (t: T, acc: U) => U): U {
-        if(l.isEmpty()) {
-            return z;
-        } else {
-            return f(l.head(), foldRight1<T, U>(l.tail(), z, f))
-        }
-    }
-
     function foldLeft1<T, U>(l: IList<T>, z: U, f: (acc: U, t: T) => U): U {
         if(l.isEmpty()) {
             return z;
         } else {
-            return foldLeft1(l.tail(), f(z, l.head()), f)
+            return foldLeft1<T, U>(l.tail(), f(z, l.head()), f);
         }
+    }
+
+    function foldRight1<T, U>(l: IList<T>, z: U, f: (t: T, acc: U) => U): U {
+        return l.reverse().foldLeft<U>(z, (acc, t) => {
+            return f(t, acc);
+        });
+    }
+
+    function map1<T, U>(l: IList<T>, f: (t: T) => U): IList<U> {
+        return l.foldRight<IList<U>>(new Nil<U>(), (t, acc) => {
+            return new Cons<U>(f(t), acc);
+        });
+    }
+
+    function concat1<T>(ll: IList<IList<T>>): IList<T> {
+        return ll.foldRight(new Nil<T>(), (t, acc) => {
+            return t.append(acc);
+        });
+    }
+
+    function flatMap1<T, U>(l: IList<T>, f: (t: T) => IList<U>): IList<U> {
+        return concat1<U>(l.map<IList<U>>(f));
+    }
+
+    function foreach1<T>(l: IList<T>, f: (t: T) => void): void {
+        l.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
+            f(t);
+            return acc;
+        });
+    }
+
+    function reverse1<T>(l: IList<T>): IList<T> {
+        return l.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
+            return new Cons<T>(t, acc);
+        });
+    }
+
+    function asArray1<T>(l: IList<T>): T[] {
+        return l.foldLeft<T[]>([], (acc, t) => {
+            acc.push(t);
+            return acc;
+        });
     }
 
     class Cons<T> implements IList<T> {
@@ -110,6 +174,26 @@ export module collections.immutable {
 
         append(l: IList<T>): IList<T> {
             return append1(this, l);
+        }
+
+        map<U>(f: (t: T) => U): IList<U> {
+            return map1(this, f);
+        }
+
+        flatMap<U>(f: (t: T) => IList<U>): IList<U> {
+            return flatMap1(this, f);
+        }
+
+        foreach(f: (t: T) => void): void {
+            return foreach1(this, f);
+        }
+
+        reverse(): IList<T> {
+            return reverse1(this);
+        }
+
+        asArray(): T[] {
+            return asArray1(this);
         }
     }
 

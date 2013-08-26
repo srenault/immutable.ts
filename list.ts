@@ -1,4 +1,4 @@
-export module collections.immutable {
+export module ts {
 
     export interface IList<T> {
         head(): T;
@@ -32,7 +32,7 @@ export module collections.immutable {
 
     export function List<T>(...as: T[]): IList<T> {
         if(as.length == 0) {
-            return nil;
+            return new Nil<T>();
         } else {
             var tail = as.splice(1, as.length)
             return new Cons<T>(as[0], List.apply(null, tail));
@@ -65,6 +65,67 @@ export module collections.immutable {
 
         foldRight<U> (z: U, f: (t: T, acc: U) => U): U {
             return foldRight1<T, U>(this, z, f);
+        }
+
+        append(l: IList<T>): IList<T> {
+            return append1(this, l);
+        }
+
+        map<U>(f: (t: T) => U): IList<U> {
+            return map1(this, f);
+        }
+
+        flatMap<U>(f: (t: T) => IList<U>): IList<U> {
+            return flatMap1(this, f);
+        }
+
+        filter(f: (t: T) => boolean): IList<T> {
+            return filter1(this, f);
+        }
+
+        foreach(f: (t: T) => void): void {
+            return foreach1(this, f);
+        }
+
+        reverse(): IList<T> {
+            return reverse1(this);
+        }
+
+        asArray(): T[] {
+            return asArray1(this);
+        }
+
+        mkString(sep: string): string {
+            return mkString1(this, sep);
+        }
+    }
+
+   class Cons<T> implements IList<T> {
+        constructor (private hd: T, private tl: IList<T>) {
+        }
+
+        head(): T {
+            return this.hd;
+        }
+
+        tail(): IList<T> {
+            return this.tl;
+        }
+
+        isEmpty(): boolean {
+            return false;
+        }
+
+        length(): number {
+            return 1 + this.tl.length();
+        }
+
+        foldRight<U>(z: U, f: (t: T, acc: U) => U): U {
+            return foldRight1(this, z, f)
+        }
+
+        foldLeft<U>(z: U, f: (acc: U, t: T) => U): U {
+            return foldLeft1(this, z, f)
         }
 
         append(l: IList<T>): IList<T> {
@@ -172,67 +233,4 @@ export module collections.immutable {
             return acc;
         });
     }
-
-    class Cons<T> implements IList<T> {
-        constructor (private hd: T, private tl: IList<T>) {
-        }
-
-        head(): T {
-            return this.hd;
-        }
-
-        tail(): IList<T> {
-            return this.tl;
-        }
-
-        isEmpty(): boolean {
-            return false;
-        }
-
-        length(): number {
-            return 1 + this.tl.length();
-        }
-
-        foldRight<U>(z: U, f: (t: T, acc: U) => U): U {
-            return foldRight1(this, z, f)
-        }
-
-        foldLeft<U>(z: U, f: (acc: U, t: T) => U): U {
-            return foldLeft1(this, z, f)
-        }
-
-        append(l: IList<T>): IList<T> {
-            return append1(this, l);
-        }
-
-        map<U>(f: (t: T) => U): IList<U> {
-            return map1(this, f);
-        }
-
-        flatMap<U>(f: (t: T) => IList<U>): IList<U> {
-            return flatMap1(this, f);
-        }
-
-        filter(f: (t: T) => boolean): IList<T> {
-            return filter1(this, f);
-        }
-
-        foreach(f: (t: T) => void): void {
-            return foreach1(this, f);
-        }
-
-        reverse(): IList<T> {
-            return reverse1(this);
-        }
-
-        asArray(): T[] {
-            return asArray1(this);
-        }
-
-        mkString(sep: string): string {
-            return mkString1(this, sep);
-        }
-    }
-
-    export var nil = new Nil<any>();
 }

@@ -1,6 +1,8 @@
-import ts = require("collections");
+import c = require("list");
+import o = require("option");
 
-var List = ts.collections.immutable.List
+var List = c.ts.List;
+var Option = o.ts.Option;
 
 var l1 = List(1, 2, 3);
 var l2 = List(4, 5, 6)
@@ -16,7 +18,21 @@ l4.foreach((t) => {
     console.log(t);
 });
 
-console.log(l3, l3.length());
-console.log(l4.asArray());
-console.log(l4.mkString(", "));
-console.log(List(1, 2).mkString(", "));
+l4.asArray();
+l4.mkString(", ");
+List(1, 2).mkString(", ");
+
+Option(null).isDefined();
+Option(null).getOrElse(() => {
+    return true;
+});
+
+Option(3).map((n) => {
+    return n * 3;
+});
+
+Option(3).flatMap((n) => {
+    return Option(4).map((n1) => {
+        return n * n1;
+    });
+});

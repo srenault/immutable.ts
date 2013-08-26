@@ -1,7 +1,9 @@
-define(["require", "exports", "collections"], function(require, exports, __ts__) {
-    var ts = __ts__;
+define(["require", "exports", "list", "option"], function(require, exports, __c__, __o__) {
+    var c = __c__;
+    var o = __o__;
 
-    var List = ts.collections.immutable.List;
+    var List = c.ts.List;
+    var Option = o.ts.Option;
 
     var l1 = List(1, 2, 3);
     var l2 = List(4, 5, 6);
@@ -17,8 +19,22 @@ define(["require", "exports", "collections"], function(require, exports, __ts__)
         console.log(t);
     });
 
-    console.log(l3, l3.length());
-    console.log(l4.asArray());
-    console.log(l4.mkString(", "));
-    console.log(List(1, 2).mkString(", "));
+    l4.asArray();
+    l4.mkString(", ");
+    List(1, 2).mkString(", ");
+
+    Option(null).isDefined();
+    Option(null).getOrElse(function () {
+        return true;
+    });
+
+    Option(3).map(function (n) {
+        return n * 3;
+    });
+
+    Option(3).flatMap(function (n) {
+        return Option(4).map(function (n1) {
+            return n * n1;
+        });
+    });
 });

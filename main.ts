@@ -1,8 +1,6 @@
-import c = require("list");
-import o = require("option");
-
-var List = c.ts.List;
-var Option = o.ts.Option;
+import Immutable = require("Immutable");
+var List = Immutable.List;
+var Option = Immutable.Option;
 
 var l1 = List(1, 2, 3);
 var l2 = List(4, 5, 6)

@@ -1,4 +1,4 @@
-import Immutable = require("immutable/package");
+import Immutable = require("lib/package");
 var List = Immutable.List;
 var Option = Immutable.Option;
 

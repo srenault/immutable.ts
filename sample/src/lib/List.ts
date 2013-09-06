@@ -1,5 +1,13 @@
+import _option = require('./Option');
+
 export interface IList<T> {
     head(): T;
+
+    last(): T;
+
+    headOption(): _option.IOption<T>;
+
+    lastOption(): _option.IOption<T>;
 
     tail(): IList<T>;
 
@@ -43,6 +51,18 @@ export class Nil<T> implements IList<T> {
 
     head(): T {
         throw new Error("head of empty list");
+    }
+
+    last(): T {
+        throw new Error("last of empty list");
+    }
+
+    headOption(): _option.IOption<T> {
+        return new _option.None<T>();
+    }
+
+    lastOption(): _option.IOption<T> {
+        return new _option.None<T>();
     }
 
     tail(): IList<T> {
@@ -104,6 +124,18 @@ class Cons<T> implements IList<T> {
 
     head(): T {
         return this.hd;
+    }
+
+    last(): T {
+        return this.reverse().head();
+    }
+
+    headOption(): _option.IOption<T> {
+        return _option.Option(this.hd);
+    }
+
+    lastOption(): _option.IOption<T> {
+        return _option.Option(this.last());
     }
 
     tail(): IList<T> {

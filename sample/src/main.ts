@@ -34,3 +34,11 @@ Option(3).flatMap((n) => {
         return n * n1;
     });
 });
+
+List(1,2,3,4).reverse();
+
+var maybeHead = List().headOption();
+console.log(maybeHead);
+
+var maybeLast = List().lastOption();
+console.log(maybeLast);

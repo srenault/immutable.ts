@@ -8,7 +8,7 @@ module.exports = function(grunt) {
             },
             scripts: {
                 files: ['lib/**/*.ts', 'sample/src/*.ts'],
-                tasks: ['typescript'],
+                tasks: ['typescript:lib', 'copy:lib', 'typescript:sample'],
                 options: {
                 }
             }
@@ -47,7 +47,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
 
     // Here we  go !
-    grunt.registerTask('default', ['typescript']);
+    grunt.registerTask('default', ['typescript:lib', 'copy:lib', 'typescript:sample']);
+    grunt.registerTask('dev', ['typescript:lib', 'copy:lib', 'typescript:sample', 'watch']);
     grunt.registerTask('lib', ['typescript:lib']);
     grunt.registerTask('sample', ['copy:lib', 'typescript:sample']);
 };

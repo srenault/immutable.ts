@@ -47,6 +47,8 @@ export interface IList<T> {
     zipWithIndex(): IList<_tuple.Tuple2<T,number>>;
 
     init(): IList<T>;
+
+    take(n: number): IList<T>;
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -151,6 +153,10 @@ export class Nil<T> implements IList<T> {
 
     init(): IList<T> {
         throw new Error("init of empty list")
+    }
+
+    take(n: number): IList<T> {
+        throw new Error("take of empty list")
     }
 }
 
@@ -278,9 +284,12 @@ class Cons<T> implements IList<T> {
     }
 
     init(): IList<T> {
-        var self = this;
+        return this.take(this.length() - 1)
+    }
+
+    take(n: number): IList<T> {
         return this.zipWithIndex().foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
-            if(t._2 >= (self.length() - 1)) {
+            if(t._2 >= n) {
                 return acc;
             }
             return new Cons<T>(t._1, acc);

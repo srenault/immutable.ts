@@ -38,6 +38,8 @@ export interface IList<T> {
 
     filter(f: (t: T) => boolean): IList<T>;
 
+    filterNot(f: (t: T) => boolean): IList<T>;
+
     foreach(f: (t: T) => void): void;
 
     reverse(): IList<T>;
@@ -143,6 +145,10 @@ export class Nil<T> implements IList<T> {
     }
 
     filter(f: (t: T) => boolean): IList<T> {
+        return this;
+    }
+
+    filterNot(f: (t: T) => boolean): IList<T> {
         return this;
     }
 
@@ -273,6 +279,12 @@ class Cons<T> implements IList<T> {
             } else {
                 return new Cons<T>(t, acc);
             }
+        });
+    }
+
+    filterNot(f:(t: T) => boolean): IList<T> {
+        return this.filter((t) => {
+            return !f(t);
         });
     }
 

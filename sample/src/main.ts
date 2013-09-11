@@ -61,3 +61,5 @@ List(1,2,3).zipWithIndex().foreach((t) => console.log(t.toString()))
 console.log("init", List(1,2,3,4).init().asArray());
 
 console.log("take", List(1,2,3,4).take(2).asArray());
+
+console.log("takeWhile", List(1,2,3,4).takeWhile((t) => t > 3).asArray());

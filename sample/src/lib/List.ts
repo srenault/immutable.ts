@@ -49,6 +49,8 @@ export interface IList<T> {
     init(): IList<T>;
 
     take(n: number): IList<T>;
+
+    takeWhile(f: (t: T) => boolean): IList<T>;
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -157,6 +159,10 @@ export class Nil<T> implements IList<T> {
 
     take(n: number): IList<T> {
         throw new Error("take of empty list")
+    }
+
+    takeWhile(f: (t: T) => boolean): IList<T> {
+        throw new Error("takeWhile of empty list")
     }
 }
 
@@ -288,11 +294,21 @@ class Cons<T> implements IList<T> {
     }
 
     take(n: number): IList<T> {
+        var self = this;
         return this.zipWithIndex().foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
             if(t._2 >= n) {
                 return acc;
             }
             return new Cons<T>(t._1, acc);
+        }).reverse();
+    }
+
+    takeWhile(f: (t: T) => boolean): IList<T> {
+        return this.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
+            if(f(t)) {
+                return acc;
+            }
+            return new Cons<T>(t, acc);
         }).reverse();
     }
 }

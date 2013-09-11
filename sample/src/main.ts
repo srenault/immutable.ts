@@ -57,3 +57,5 @@ List(1,2,3).zip(List(1,2,3)).foreach((t) => console.log(t.toString()))
 
 console.log("zipWithIndex")
 List(1,2,3).zipWithIndex().foreach((t) => console.log(t.toString()))
+
+console.log("init", List(1,2,3,4).init().asArray());

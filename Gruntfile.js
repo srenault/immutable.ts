@@ -8,7 +8,7 @@ module.exports = function(grunt) {
             },
             scripts: {
                 files: ['lib/**/*.ts', 'sample/src/*.ts'],
-                tasks: ['typescript:lib', 'copy:lib', 'typescript:sample'],
+                tasks: ['copy:lib', 'typescript:sample'],
                 options: {
                 }
             }

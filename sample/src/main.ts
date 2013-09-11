@@ -16,7 +16,6 @@ l4.foreach((t) => {
     console.log(t);
 });
 
-l4.asArray();
 l4.mkString(", ");
 List(1, 2).mkString(", ");
 
@@ -35,10 +34,26 @@ Option(3).flatMap((n) => {
     });
 });
 
-List(1,2,3,4).reverse();
+console.log("asArray", List(1,2,3,4).asArray());
 
-var maybeHead = List().headOption();
-console.log(maybeHead);
+console.log("reverse", List(1,2,3,4).reverse().mkString(", "));
 
-var maybeLast = List().lastOption();
-console.log(maybeLast);
+console.log("headOption", List().headOption());
+
+console.log("lastOption", List().lastOption());
+
+console.log("headOption", List(1).headOption());
+
+console.log("append", List(1,2,3,4).append(List(5,6,7,8)).mkString(", "));
+
+console.log("prepend", List(5,6,7,8).prepend(List(1,2,3,4)).mkString(", "));
+
+console.log("prependOne", List(5,6,7,8).prependOne(4).mkString(", "));
+
+console.log("appendOne", List(1,2,3).appendOne(4).mkString(", "));
+
+console.log("zip")
+List(1,2,3).zip(List(1,2,3)).foreach((t) => console.log(t.toString()))
+
+console.log("zipWithIndex")
+List(1,2,3).zipWithIndex().foreach((t) => console.log(t.toString()))

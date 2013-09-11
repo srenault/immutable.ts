@@ -1,4 +1,5 @@
 import _option = require('./Option');
+import _tuple = require('./Tuple');
 
 export interface IList<T> {
     head(): T;
@@ -19,7 +20,13 @@ export interface IList<T> {
 
     foldRight<U>(z: U, f: (t: T, acc: U) => U): U;
 
+    appendOne(t: T): IList<T>;
+
     append(l: IList<T>): IList<T>;
+
+    prependOne(t: T): IList<T>;
+
+    prepend(l: IList<T>): IList<T>;
 
     map<U>(f: (t: T) => U): IList<U>;
 
@@ -34,13 +41,17 @@ export interface IList<T> {
     asArray(): T[];
 
     mkString(sep: string): string;
+
+    zip<U>(l: IList<U>): IList<_tuple.Tuple2<T,U>>;
+
+    zipWithIndex(): IList<_tuple.Tuple2<T,number>>;
 }
 
 export function List<T>(...as: T[]): IList<T> {
     if(as.length == 0) {
         return new Nil<T>();
     } else {
-        var tail = as.splice(1, as.length)
+        var tail = as.splice(1, as.length);
         return new Cons<T>(as[0], List.apply(null, tail));
     }
 }
@@ -78,43 +89,62 @@ export class Nil<T> implements IList<T> {
     }
 
     foldLeft<U> (z: U, f: (acc: U, t: T) => U): U {
-        return foldLeft1<T, U>(this, z, f);
+        return z;
     }
 
     foldRight<U> (z: U, f: (t: T, acc: U) => U): U {
-        return foldRight1<T, U>(this, z, f);
+        return z;
+    }
+
+    appendOne(t: T): IList<T> {
+        return List(t);
     }
 
     append(l: IList<T>): IList<T> {
-        return append1(this, l);
+        return l;
+    }
+
+    prependOne(t: T): IList<T> {
+        return List(t);
+    }
+
+    prepend(l: IList<T>): IList<T> {
+        return l;
     }
 
     map<U>(f: (t: T) => U): IList<U> {
-        return map1(this, f);
+        return new Nil<U>();
     }
 
     flatMap<U>(f: (t: T) => IList<U>): IList<U> {
-        return flatMap1(this, f);
+        return new Nil<U>();
     }
 
     filter(f: (t: T) => boolean): IList<T> {
-        return filter1(this, f);
+        return this;
     }
 
     foreach(f: (t: T) => void): void {
-        return foreach1(this, f);
     }
 
     reverse(): IList<T> {
-        return reverse1(this);
+        return this;
     }
 
     asArray(): T[] {
-        return asArray1(this);
+        return [];
     }
 
     mkString(sep: string): string {
-        return mkString1(this, sep);
+        return "";
+    }
+
+    zip<U>(l: IList<U>): IList<_tuple.Tuple2<T,U>> {
+        return new Nil<_tuple.Tuple2<T,U>>();
+    }
+
+    zipWithIndex(): IList<_tuple.Tuple2<T,number>> {
+        return new Nil<_tuple.Tuple2<T,number>>();
     }
 }
 
@@ -158,24 +188,47 @@ class Cons<T> implements IList<T> {
         return foldLeft1(this, z, f)
     }
 
+    appendOne(t: T): IList<T> {
+        return append1(this, List(t));
+    }
+
     append(l: IList<T>): IList<T> {
         return append1(this, l);
     }
 
+    prependOne(t: T): IList<T> {
+        return prepend1(this, List(t));
+    }
+
+    prepend(l: IList<T>): IList<T> {
+        return prepend1(this, l);
+    }
+
     map<U>(f: (t: T) => U): IList<U> {
-        return map1(this, f);
+        return this.foldRight<IList<U>>(new Nil<U>(), (t, acc) => {
+            return new Cons<U>(f(t), acc);
+        });
     }
 
     flatMap<U>(f: (t: T) => IList<U>): IList<U> {
-        return flatMap1(this, f);
+        return concat1<U>(this.map<IList<U>>(f));
     }
 
     filter(f: (t: T) => boolean): IList<T> {
-        return filter1(this, f);
+        return this.foldRight<IList<T>>(new Nil<T>(), (t, acc) => {
+            if(f(t)) {
+                return acc;
+            } else {
+                return new Cons<T>(t, acc);
+            }
+        });
     }
 
     foreach(f: (t: T) => void): void {
-        return foreach1(this, f);
+        this.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
+            f(t);
+            return acc;
+        });
     }
 
     reverse(): IList<T> {
@@ -183,11 +236,39 @@ class Cons<T> implements IList<T> {
     }
 
     asArray(): T[] {
-        return asArray1(this);
+        return this.foldLeft<T[]>([], (acc, t) => {
+            acc.push(t);
+            return acc;
+        });
     }
 
     mkString(sep: string): string {
-        return mkString1(this, sep);
+        return this.foldLeft<string>("", (acc, t) => {
+            if(acc == "") return t;
+            else return acc + sep + t;
+        });
+    }
+
+    zip<U>(l: IList<U>): IList<_tuple.Tuple2<T,U>> {
+        var step = (l1: IList<T>, l2: IList<U>, acc: IList<_tuple.Tuple2<T,U>>) => {
+            return l1.headOption().flatMap((t) => {
+                return l2.headOption().map((u) => {
+                    var res = new Cons<_tuple.Tuple2<T,U>>(new _tuple.Tuple2(t, u), acc)
+                    return step(l1.tail(), l2.tail(), res)
+                });
+            }).getOrElse(() => {
+                return acc.reverse();
+            });
+        }
+        return step(this, l, new Nil<_tuple.Tuple2>());
+    }
+
+    zipWithIndex(): IList<_tuple.Tuple2<T,number>> {
+        var indexes = List(0);
+        for(var i=1; i<this.length(); i++) {
+            indexes.appendOne(i)
+        }
+        return this.zip<number>(indexes);
     }
 }
 
@@ -195,6 +276,10 @@ function append1<T>(l1: IList<T>, l2: IList<T>): IList<T> {
     return foldRight1(l1, l2, (t, acc) => {
         return new Cons<T>(t, acc)
     });
+}
+
+function prepend1<T>(l1: IList<T>, l2: IList<T>): IList<T> {
+    return append1(l2, l1);
 }
 
 function foldLeft1<T, U>(l: IList<T>, z: U, f: (acc: U, t: T) => U): U {
@@ -211,55 +296,14 @@ function foldRight1<T, U>(l: IList<T>, z: U, f: (t: T, acc: U) => U): U {
     });
 }
 
-function map1<T, U>(l: IList<T>, f: (t: T) => U): IList<U> {
-    return l.foldRight<IList<U>>(new Nil<U>(), (t, acc) => {
-        return new Cons<U>(f(t), acc);
-    });
-}
-
-function concat1<T>(ll: IList<IList<T>>): IList<T> {
-    return ll.foldRight(new Nil<T>(), (t, acc) => {
+function concat1<T>(l: IList<IList<T>>): IList<T> {
+    return l.foldRight(new Nil<T>(), (t, acc) => {
         return t.append(acc);
-    });
-}
-
-function flatMap1<T, U>(l: IList<T>, f: (t: T) => IList<U>): IList<U> {
-    return concat1<U>(l.map<IList<U>>(f));
-}
-
-function filter1<T>(l: IList<T>, f: (t: T) => boolean): IList<T> {
-    return l.foldRight<IList<T>>(new Nil<T>(), (t, acc) => {
-        if(f(t)) {
-            return acc;
-        } else {
-            return new Cons<T>(t, acc);
-        }
-    });
-}
-
-function foreach1<T>(l: IList<T>, f: (t: T) => void): void {
-    l.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
-        f(t);
-        return acc;
     });
 }
 
 function reverse1<T>(l: IList<T>): IList<T> {
     return l.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
         return new Cons<T>(t, acc);
-    });
-}
-
-function mkString1<T>(l: IList<T>, sep: string): string {
-    return l.foldLeft<string>("", (acc, t) => {
-        if(acc == "") return t;
-        else return acc + sep + t;
-    });
-}
-
-function asArray1<T>(l: IList<T>): T[] {
-    return l.foldLeft<T[]>([], (acc, t) => {
-        acc.push(t);
-        return acc;
     });
 }

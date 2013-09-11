@@ -57,6 +57,8 @@ export interface IList<T> {
     takeWhile(f: (t: T) => boolean): IList<T>;
 
     get(n: number): T;
+
+    splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>>;
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -168,19 +170,23 @@ export class Nil<T> implements IList<T> {
     }
 
     init(): IList<T> {
-        throw new Error("init of empty list")
+        throw new Error("init of empty list");
     }
 
     take(n: number): IList<T> {
-        throw new Error("take of empty list")
+        throw new Error("take of empty list");
     }
 
     takeWhile(f: (t: T) => boolean): IList<T> {
-        throw new Error("takeWhile of empty list")
+        throw new Error("takeWhile of empty list");
     }
 
     get(n: number): T {
-        throw new Error("get of empty list")
+        throw new Error("get of empty list");
+    }
+
+    splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>> {
+        throw new Error("split of empty list");
     }
 }
 
@@ -352,7 +358,24 @@ class Cons<T> implements IList<T> {
             });
             if(r) return r;
         }
-        throw new Error("Index out of bounds")
+        throw new Error("Index out of bounds");
+    }
+
+    splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>> {
+        if(n > 0) {
+            var z = new _tuple.Tuple2(new Nil<T>(), new Nil<T>());
+            return this.zipWithIndex().foldLeft(z, (acc, t) => {
+                if(t._2 < n) {
+                    var left = acc._1.appendOne(t._1);
+                    return new _tuple.Tuple2(left, acc._2);
+                } else {
+                    var right = acc._2.appendOne(t._1);
+                    return new _tuple.Tuple2(acc._1, right);
+                }
+            });
+        } else {
+            throw new Error("Index out of bounds");
+        }
     }
 }
 

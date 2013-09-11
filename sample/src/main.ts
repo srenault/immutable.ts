@@ -69,3 +69,7 @@ console.log("reduceRight", List(1,2,3).reduceRight((t, acc) => { return t + acc 
 console.log("reduceLeft", List(1,2,3).reduceLeft((acc, t) => { return t + acc }));
 
 console.log("get", List(1,2,3,4).get(1));
+
+console.log("splitAt");
+console.log(List(1,2,3,4,5,6).splitAt(3)._1.asArray());
+console.log(List(1,2,3,4,5,6).splitAt(3)._2.asArray());

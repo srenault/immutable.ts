@@ -63,3 +63,9 @@ console.log("init", List(1,2,3,4).init().asArray());
 console.log("take", List(1,2,3,4).take(2).asArray());
 
 console.log("takeWhile", List(1,2,3,4).takeWhile((t) => t > 3).asArray());
+
+console.log("reduceRight", List(1,2,3).reduceRight((t, acc) => { return t + acc }));
+
+console.log("reduceLeft", List(1,2,3).reduceLeft((acc, t) => { return t + acc }));
+
+console.log("get", List(1,2,3,4).get(1));

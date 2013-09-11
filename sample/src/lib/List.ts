@@ -20,6 +20,10 @@ export interface IList<T> {
 
     foldRight<U>(z: U, f: (t: T, acc: U) => U): U;
 
+    reduceRight<U>(f: (t: T, acc: U) => U): U;
+
+    reduceLeft<U>(f: (acc: U, t: T) => U): U;
+
     appendOne(t: T): IList<T>;
 
     append(l: IList<T>): IList<T>;
@@ -51,6 +55,8 @@ export interface IList<T> {
     take(n: number): IList<T>;
 
     takeWhile(f: (t: T) => boolean): IList<T>;
+
+    get(n: number): T;
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -100,6 +106,14 @@ export class Nil<T> implements IList<T> {
 
     foldRight<U> (z: U, f: (t: T, acc: U) => U): U {
         return z;
+    }
+
+    reduceRight<U> (f: (t: T, acc: U) => U): U {
+        throw new Error("reduceRight of empty list");
+    }
+
+    reduceLeft<U> (f: (t: T, acc: U) => U): U {
+        throw new Error("reduceLeft of empty list");
     }
 
     appendOne(t: T): IList<T> {
@@ -164,6 +178,10 @@ export class Nil<T> implements IList<T> {
     takeWhile(f: (t: T) => boolean): IList<T> {
         throw new Error("takeWhile of empty list")
     }
+
+    get(n: number): T {
+        throw new Error("get of empty list")
+    }
 }
 
 class Cons<T> implements IList<T> {
@@ -206,6 +224,16 @@ class Cons<T> implements IList<T> {
         return foldLeft1(this, z, f)
     }
 
+    reduceRight<U> (f: (t: T, acc: U) => U): U {
+        var z = <U><any>this.head();
+        return this.tail().foldRight(z, f);
+    }
+
+    reduceLeft<U> (f: (acc: U, t: T) => U): U {
+        var z = <U><any>this.head();
+        return this.tail().foldLeft(z, f);
+    }
+
     appendOne(t: T): IList<T> {
         return append1(this, List(t));
     }
@@ -223,7 +251,7 @@ class Cons<T> implements IList<T> {
     }
 
     map<U>(f: (t: T) => U): IList<U> {
-        return this.foldRight<IList<U>>(new Nil<U>(), (t, acc) => {
+        return this.foldRight(new Nil<U>(), (t, acc) => {
             return new Cons<U>(f(t), acc);
         });
     }
@@ -243,7 +271,7 @@ class Cons<T> implements IList<T> {
     }
 
     foreach(f: (t: T) => void): void {
-        this.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
+        this.foldLeft(new Nil<T>(), (acc, t) => {
             f(t);
             return acc;
         });
@@ -310,6 +338,21 @@ class Cons<T> implements IList<T> {
             }
             return new Cons<T>(t, acc);
         }).reverse();
+    }
+
+    get(n: number): T {
+        var r;
+        if(n > 0) {
+            r = this.zipWithIndex().reduceRight((t, acc) => {
+                if(t._2 == n) {
+                    return t._1;
+                } else {
+                    return null;
+                }
+            });
+            if(r) return r;
+        }
+        throw new Error("Index out of bounds")
     }
 }
 

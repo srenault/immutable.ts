@@ -61,6 +61,8 @@ export interface IList<T> {
     get(n: number): T;
 
     splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>>;
+
+    count(f: (t) => boolean): number
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -193,6 +195,10 @@ export class Nil<T> implements IList<T> {
 
     splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>> {
         throw new Error("split of empty list");
+    }
+
+    count(f: (t) => boolean): number {
+        return 0;
     }
 }
 
@@ -388,6 +394,16 @@ class Cons<T> implements IList<T> {
         } else {
             throw new Error("Index out of bounds");
         }
+    }
+
+    count(f: (t) => boolean): number {
+        return this.foldLeft(0, (acc, t) => {
+            if(f(t)) {
+                return acc;
+            } else {
+                return acc + 1;
+            }
+        });
     }
 }
 

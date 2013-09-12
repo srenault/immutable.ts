@@ -1,6 +1,8 @@
-import Immutable = require("lib/package");
-var List = Immutable.List;
-var Option = Immutable.Option;
+import _list = require("lib/immutable/List");
+import _option = require('./lib/immutable/Option');
+
+var List = _list.List;
+var Option = _option.Option;
 
 var l1 = List(1, 2, 3);
 var l2 = List(4, 5, 6)
@@ -91,3 +93,12 @@ console.log("distinct", List(1,4,3,4).distinct().asArray());
 console.log("drop", List(1,2,3,4).drop(2).asArray());
 
 console.log("dropWhile", List(1,2,3,4).dropWhile((t) => { return t < 3; }).asArray());
+
+console.log("flatten", List(List(1,2), List(3,4)).flatten().asArray());
+
+console.log("flatten", List<_option.IOption<number>>(new _option.None<number>(), new _option.Some<number>(1)).flatten().asArray());
+
+console.log("flatMap");
+console.log(List(1,2).flatMap((t) => {
+    return List(3,4);
+}).asArray());

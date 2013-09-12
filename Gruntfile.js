@@ -7,7 +7,7 @@ module.exports = function(grunt) {
                 livereload: true
             },
             scripts: {
-                files: ['lib/**/*.ts', 'sample/src/*.ts'],
+                files: ['lib/**/*.ts', 'sample/src/main.ts'],
                 tasks: ['copy:lib', 'typescript:sample'],
                 options: {
                 }
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
                 cwd: 'lib',
                 src: ['**'],
                 dest: 'sample/src/lib',
-                flatten: true,
+                flatten: false,
                 expand: true
             }
         }
@@ -48,7 +48,7 @@ module.exports = function(grunt) {
 
     // Here we  go !
     grunt.registerTask('default', ['typescript:lib', 'copy:lib', 'typescript:sample']);
-    grunt.registerTask('dev', ['typescript:lib', 'copy:lib', 'typescript:sample', 'watch']);
+    grunt.registerTask('dev', ['copy:lib', 'typescript:sample', 'watch']);
     grunt.registerTask('lib', ['typescript:lib']);
     grunt.registerTask('sample', ['copy:lib', 'typescript:sample']);
 };

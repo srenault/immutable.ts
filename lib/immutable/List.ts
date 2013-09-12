@@ -1,7 +1,8 @@
+import _tr = require('./Traversable');
 import _option = require('./Option');
 import _tuple = require('./Tuple');
 
-export interface IList<T> {
+export interface IList<T> extends _tr.ITraversable<T> {
     head(): T;
 
     last(): T;
@@ -35,6 +36,8 @@ export interface IList<T> {
     map<U>(f: (t: T) => U): IList<U>;
 
     flatMap<U>(f: (t: T) => IList<U>): IList<U>;
+
+    flatten<U>(): IList<T>;
 
     filter(f: (t: T) => boolean): IList<T>;
 
@@ -158,6 +161,10 @@ export class Nil<T> implements IList<T> {
         return new Nil<U>();
     }
 
+    flatten<U>(): IList<T> {
+        return this;
+    }
+
     filter(f: (t: T) => boolean): IList<T> {
         return this;
     }
@@ -238,7 +245,7 @@ export class Nil<T> implements IList<T> {
     }
 }
 
-class Cons<T> implements IList<T> {
+export class Cons<T> implements IList<T> {
     constructor (private hd: T, private tl: IList<T>) {
     }
 
@@ -310,8 +317,24 @@ class Cons<T> implements IList<T> {
         });
     }
 
-    flatMap<U>(f: (t: T) => IList<U>): IList<U> {
-        return concat1<U>(this.map<IList<U>>(f));
+    flatMap<U>(f: (t: T) => _tr.ITraversable<U>): IList<U> {
+        return <IList<U>> this.map<_tr.ITraversable<U>>(f).flatten<U>();
+    }
+
+    flatten<U>(): IList<U> {
+        return this.foldLeft<IList<U>>(new Nil<U>(), (acc, t) => {
+            if(_tr.isList(t)) {
+                var l = <IList<U>><any> t;
+                return acc.append(l);
+            } else if(_tr.isOption(t)) {
+                var o = <_option.IOption<U>><any> t;
+                if(o.isDefined()) {
+                    return acc.appendOne(o.get());
+                } else return acc;
+            } else {
+                return acc.appendOne(<U><any> t);
+            }
+        });
     }
 
     filter(f: (t: T) => boolean): IList<T> {

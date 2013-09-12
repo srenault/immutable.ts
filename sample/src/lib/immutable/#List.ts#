@@ -1,7 +1,8 @@
+import _it = require('./Iterable');
 import _option = require('./Option');
 import _tuple = require('./Tuple');
 
-export interface IList<T> {
+export interface IList<T> extends _it.Iterable<T> {
     head(): T;
 
     last(): T;
@@ -35,6 +36,8 @@ export interface IList<T> {
     map<U>(f: (t: T) => U): IList<U>;
 
     flatMap<U>(f: (t: T) => IList<U>): IList<U>;
+
+    flatten(): IList<T>;
 
     filter(f: (t: T) => boolean): IList<T>;
 
@@ -158,6 +161,10 @@ export class Nil<T> implements IList<T> {
         return new Nil<U>();
     }
 
+    flatten(): IList<T> {
+        return this;
+    }
+
     filter(f: (t: T) => boolean): IList<T> {
         return this;
     }
@@ -238,7 +245,7 @@ export class Nil<T> implements IList<T> {
     }
 }
 
-class Cons<T> implements IList<T> {
+export class Cons<T> implements IList<T> {
     constructor (private hd: T, private tl: IList<T>) {
     }
 
@@ -310,8 +317,24 @@ class Cons<T> implements IList<T> {
         });
     }
 
-    flatMap<U>(f: (t: T) => IList<U>): IList<U> {
+    flatMap<U>(f: (t: T) => _it.ITraversable<U>): IList<U> {
         return concat1<U>(this.map<IList<U>>(f));
+    }
+
+    flatten(): IList<T> {
+        return this.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
+            if(t instanceof Cons || t instanceof Nil) {
+                var l = <IList<T>> <any> t;
+                return acc.append(l);
+            } else if(t instanceof _option.Some || t instanceof _option.None) {
+                var o = <_option.IOption<T>> <any> t;
+                if(o.isDefined()) {
+                    return acc.appendOne(o.get());
+                } else return acc;
+            } else {
+                return acc.appendOne(t);
+            }
+        });
     }
 
     filter(f: (t: T) => boolean): IList<T> {

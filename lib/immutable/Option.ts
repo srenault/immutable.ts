@@ -1,4 +1,6 @@
-export interface IOption<T> {
+import _tr = require('./Traversable');
+
+export interface IOption<T> extends _tr.ITraversable<T> {
     get(): T;
     getOrElse(f: () => any): any;
     isEmpty(): boolean;

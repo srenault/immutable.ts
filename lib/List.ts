@@ -38,6 +38,8 @@ export interface IList<T> {
 
     filter(f: (t: T) => boolean): IList<T>;
 
+    find(f: (t: T) => boolean): _option.IOption<T>;
+
     filterNot(f: (t: T) => boolean): IList<T>;
 
     foreach(f: (t: T) => void): void;
@@ -148,6 +150,10 @@ export class Nil<T> implements IList<T> {
 
     filter(f: (t: T) => boolean): IList<T> {
         return this;
+    }
+
+    find(f: (t: T) => boolean): _option.IOption<T> {
+        return new _option.None<T>();
     }
 
     filterNot(f: (t: T) => boolean): IList<T> {
@@ -284,6 +290,17 @@ class Cons<T> implements IList<T> {
                 return acc;
             } else {
                 return new Cons<T>(t, acc);
+            }
+        });
+    }
+
+    find(f: (t: T) => boolean): _option.IOption<T> {
+        var z = new _option.None<T>();
+        return this.foldLeft<_option.IOption<T>>(z, (acc, t) => {
+            if(f(t)) {
+                return new _option.Some<T>(t);
+            } else {
+                return acc;
             }
         });
     }
@@ -442,3 +459,12 @@ function reverse1<T>(l: IList<T>): IList<T> {
         return new Cons<T>(t, acc);
     });
 }
+
+// function occurences1<T>(l: IList<T>): {} {
+//     //Typescript.Collections.HashTable;
+//     var keysValues = {};
+//     l.foreach((t) => {
+//         keysValues[t] = keysValues[t] ? keysValues[t] + 1 : 1;
+//     });
+//     return keysValues;
+// }

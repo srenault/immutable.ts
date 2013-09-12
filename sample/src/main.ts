@@ -79,3 +79,5 @@ console.log("filter", List(1,2,3,4).filter((t) => { return t < 3 }).asArray());
 console.log("filterNot", List(1,2,3,4).filterNot((t) => { return t < 3 }).asArray());
 
 console.log("count", List(1,2,3,4).count((t) => { return t < 3 }));
+
+console.log("find", List(1,2,3,4).find((t) => { return t == 4 }));

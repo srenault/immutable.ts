@@ -64,7 +64,17 @@ export interface IList<T> {
 
     splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>>;
 
-    count(f: (t) => boolean): number
+    count(f: (t: T) => boolean): number
+
+    contains(t: T): boolean
+
+    exists(f: (t: T) => boolean): boolean
+
+    distinct(): IList<T>
+
+    drop(n: number): IList<T>
+
+    dropWhile(f: (t: T) => boolean): IList<T>
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -192,7 +202,15 @@ export class Nil<T> implements IList<T> {
     }
 
     takeWhile(f: (t: T) => boolean): IList<T> {
-        throw new Error("takeWhile of empty list");
+        return this;
+    }
+
+    drop(n: number): IList<T> {
+        throw new Error("drop of empty list");
+    }
+
+    dropWhile(f: (t: T) => boolean): IList<T> {
+        return this;
     }
 
     get(n: number): T {
@@ -205,6 +223,18 @@ export class Nil<T> implements IList<T> {
 
     count(f: (t) => boolean): number {
         return 0;
+    }
+
+    contains(t: T): boolean {
+        return false;
+    }
+
+    exists(f: (t: T) => boolean): boolean {
+        return false;
+    }
+
+    distinct(): IList<T> {
+        return new Nil<T>();
     }
 }
 
@@ -363,7 +393,6 @@ class Cons<T> implements IList<T> {
     }
 
     take(n: number): IList<T> {
-        var self = this;
         return this.zipWithIndex().foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
             if(t._2 >= n) {
                 return acc;
@@ -373,6 +402,25 @@ class Cons<T> implements IList<T> {
     }
 
     takeWhile(f: (t: T) => boolean): IList<T> {
+        return this.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
+            if(f(t)) {
+                return new Cons<T>(t, acc);
+            } else {
+                return acc;
+            }
+        }).reverse();
+    }
+
+    drop(n: number): IList<T> {
+        return this.zipWithIndex().foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
+            if(t._2 == n) {
+                return acc;
+            }
+            return new Cons<T>(t._1, acc);
+        }).reverse();
+    }
+
+    dropWhile(f: (t: T) => boolean): IList<T> {
         return this.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
             if(f(t)) {
                 return acc;
@@ -419,6 +467,26 @@ class Cons<T> implements IList<T> {
                 return acc;
             } else {
                 return acc + 1;
+            }
+        });
+    }
+
+    contains(t: T): boolean {
+        return this.find((t1) => {
+            return t == t1;
+        }).isDefined();
+    }
+
+    exists(f: (t: T) => boolean): boolean {
+        return this.find(f).isDefined();
+    }
+
+    distinct(): IList<T> {
+        return this.foldLeft(new Nil<T>(), (acc, t) => {
+            if(acc.contains(t)) {
+                return acc;
+            } else {
+                return acc.appendOne(t);
             }
         });
     }

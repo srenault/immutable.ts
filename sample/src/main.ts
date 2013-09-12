@@ -81,3 +81,13 @@ console.log("filterNot", List(1,2,3,4).filterNot((t) => { return t < 3 }).asArra
 console.log("count", List(1,2,3,4).count((t) => { return t < 3 }));
 
 console.log("find", List(1,2,3,4).find((t) => { return t == 4 }));
+
+console.log("contains", List(1,2,3,4).contains(4));
+
+console.log("exists", List(1,2,3,4).exists((t) => {return t == 4;}));
+
+console.log("distinct", List(1,4,3,4).distinct().asArray());
+
+console.log("drop", List(1,2,3,4).drop(2).asArray());
+
+console.log("dropWhile", List(1,2,3,4).dropWhile((t) => { return t < 3; }).asArray());

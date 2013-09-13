@@ -451,10 +451,7 @@ export class Cons<T> implements IList<T> {
     }
 
     zipWithIndex(): IList<_tuple.Tuple2<T,number>> {
-        var indexes = List(0);
-        for(var i=1; i<this.length(); i++) {
-            indexes = indexes.appendOne(i)
-        }
+        var indexes = new _range.Range(0, this.length()).toList();
         return this.zip<number>(indexes);
     }
 

@@ -93,6 +93,8 @@ export interface IList<T> extends _tr.ITraversable<T> {
     indexWhereAfter(f: (t: T) => boolean, from: number): number;
 
     padTo(len: number, t: T): IList<T>
+
+    span(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>>
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -285,6 +287,11 @@ export class Nil<T> implements IList<T> {
 
     padTo(len: number, t: T): IList<T> {
         return padTo1(this, len, t);
+    }
+
+    span(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>> {
+        var nil = new Nil<T>();
+        return new _tuple.Tuple2<IList<T>,IList<T>>(nil, nil);
     }
 }
 
@@ -598,6 +605,20 @@ export class Cons<T> implements IList<T> {
 
     padTo(len: number, t: T): IList<T> {
         return padTo1(this, len, t);
+    }
+
+    span(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>> {
+        var nil = new Nil<T>();
+        var z = new _tuple.Tuple2<IList<T>,IList<T>>(nil, nil);
+        return this.foldLeft(z, (acc, t) => {
+            if(f(t)) {
+                var left = acc._1.appendOne(t);
+                return new _tuple.Tuple2<IList<T>,IList<T>>(left, acc._2);
+            } else {
+                var right = acc._2.appendOne(t);
+                return new _tuple.Tuple2<IList<T>,IList<T>>(acc._1, right);
+            }
+        });
     }
 }
 

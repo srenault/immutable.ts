@@ -114,3 +114,5 @@ console.log("indexWhere", List(1,2,3,4,2).indexWhere((t) => { return t == 2; }))
 console.log("indexWhereAfter", List(1,2,3,4,2).indexWhere((t) => { return t == 2; }), 2);
 
 console.log("padTo", List(1,2,3,4,5).padTo(10, 0).asArray());
+
+console.log("span", List(1,2,3,4).span((t) => { return t < 3; }));

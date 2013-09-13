@@ -102,3 +102,15 @@ console.log("flatMap");
 console.log(List(1,2).flatMap((t) => {
     return List(3,4);
 }).asArray());
+
+console.log("dropRight", List(1,2,3,4).dropRigth(1).asArray());
+
+console.log("indexOf", List(1,2,3,4).indexOf(2));
+
+console.log("indexOfAfter", List(1,2,3,4,2).indexOfAfter(2, 2));
+
+console.log("indexWhere", List(1,2,3,4,2).indexWhere((t) => { return t == 2; }));
+
+console.log("indexWhereAfter", List(1,2,3,4,2).indexWhere((t) => { return t == 2; }), 2);
+
+console.log("padTo", List(1,2,3,4,5).padTo(10, 0).asArray());

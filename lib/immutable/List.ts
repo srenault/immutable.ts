@@ -1,6 +1,7 @@
 import _tr = require('./Traversable');
 import _option = require('./Option');
 import _tuple = require('./Tuple');
+import _range = require('./Range');
 
 export interface IList<T> extends _tr.ITraversable<T> {
     head(): T;
@@ -14,6 +15,8 @@ export interface IList<T> extends _tr.ITraversable<T> {
     tail(): IList<T>;
 
     isEmpty(): boolean;
+
+    nonEmpty(): boolean;
 
     length(): number;
 
@@ -37,7 +40,7 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     flatMap<U>(f: (t: T) => IList<U>): IList<U>;
 
-    flatten<U>(): IList<T>;
+    flatten<U>(): IList<U>;
 
     filter(f: (t: T) => boolean): IList<T>;
 
@@ -67,17 +70,29 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>>;
 
-    count(f: (t: T) => boolean): number
+    count(f: (t: T) => boolean): number;
 
-    contains(t: T): boolean
+    contains(t: T): boolean;
 
-    exists(f: (t: T) => boolean): boolean
+    exists(f: (t: T) => boolean): boolean;
 
-    distinct(): IList<T>
+    distinct(): IList<T>;
 
-    drop(n: number): IList<T>
+    drop(n: number): IList<T>;
 
-    dropWhile(f: (t: T) => boolean): IList<T>
+    dropRigth(n: number): IList<T>;
+
+    dropWhile(f: (t: T) => boolean): IList<T>;
+
+    indexOf(t: T): number;
+
+    indexOfAfter(t: T, from: number): number;
+
+    indexWhere(f: (t: T) => boolean): number;
+
+    indexWhereAfter(f: (t: T) => boolean, from: number): number;
+
+    padTo(len: number, t: T): IList<T>
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -115,6 +130,10 @@ export class Nil<T> implements IList<T> {
 
     isEmpty(): boolean {
         return true;
+    }
+
+    nonEmpty(): boolean {
+        return !this.isEmpty();
     }
 
     length(): number {
@@ -161,8 +180,8 @@ export class Nil<T> implements IList<T> {
         return new Nil<U>();
     }
 
-    flatten<U>(): IList<T> {
-        return this;
+    flatten<U>(): IList<U> {
+        return new Nil<U>();
     }
 
     filter(f: (t: T) => boolean): IList<T> {
@@ -220,6 +239,10 @@ export class Nil<T> implements IList<T> {
         return this;
     }
 
+    dropRigth(n: number): IList<T> {
+        throw new Error("dropRight of empty list");
+    }
+
     get(n: number): T {
         throw new Error("get of empty list");
     }
@@ -242,6 +265,26 @@ export class Nil<T> implements IList<T> {
 
     distinct(): IList<T> {
         return new Nil<T>();
+    }
+
+    indexOf(t: T): number {
+        return - 1;
+    }
+
+    indexOfAfter(t: T, from: number): number {
+        return -1;
+    }
+
+    indexWhere(f: (t: T) => boolean): number {
+        return -1;
+    }
+
+    indexWhereAfter(f: (t: T) => boolean, from: number): number {
+        return -1;
+    }
+
+    padTo(len: number, t: T): IList<T> {
+        return padTo1(this, len, t);
     }
 }
 
@@ -271,6 +314,10 @@ export class Cons<T> implements IList<T> {
 
     isEmpty(): boolean {
         return false;
+    }
+
+    nonEmpty(): boolean {
+        return !this.isEmpty();
     }
 
     length(): number {
@@ -452,6 +499,16 @@ export class Cons<T> implements IList<T> {
         }).reverse();
     }
 
+    dropRigth(n: number): IList<T> {
+        var self = this;
+        return this.zipWithIndex().foldRight<IList<T>>(new Nil<T>(), (t, acc) => {
+            if(t._2 == (self.length() - n)) {
+                return acc;
+            }
+            return new Cons<T>(t._1, acc);
+        });
+    }
+
     get(n: number): T {
         var r;
         if(n > 0) {
@@ -513,6 +570,38 @@ export class Cons<T> implements IList<T> {
             }
         });
     }
+
+    indexOf(t: T): number {
+        return this.indexWhere((t1) => {
+            return t == t1;
+        });
+    }
+
+    indexOfAfter(t: T, from: number): number {
+        return this.indexWhereAfter((t1) => {
+            return t == t1;
+        }, from);
+    }
+
+    indexWhere(f: (t: T) => boolean): number {
+        return this.zipWithIndex().foldLeft(-1, (acc, t1) => {
+            if(f(t1._1)) {
+                return t1._2;
+            } else return acc;
+        });
+    }
+
+    indexWhereAfter(f: (t: T) => boolean, from: number): number {
+        return this.zipWithIndex().foldLeft(-1, (acc, t1) => {
+            if(f(t1._1) && from < t1._2) {
+                return t1._2;
+            } else return acc;
+        });
+    }
+
+    padTo(len: number, t: T): IList<T> {
+        return padTo1(this, len, t);
+    }
 }
 
 function append1<T>(l1: IList<T>, l2: IList<T>): IList<T> {
@@ -549,6 +638,18 @@ function reverse1<T>(l: IList<T>): IList<T> {
     return l.foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
         return new Cons<T>(t, acc);
     });
+}
+
+function padTo1<T>(l: IList<T>, len: number, t: T): IList<T> {
+    if(l.length() < len) {
+        var rest = len - l.length();
+        var pad: IList<T> = new _range.Range(0, rest).toList().map<T>((_) => {
+            return t;
+        });
+        return l.append(pad);
+    } else {
+        return l;
+    }
 }
 
 // function occurences1<T>(l: IList<T>): {} {

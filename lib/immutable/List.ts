@@ -447,7 +447,7 @@ export class Cons<T> implements IList<T> {
                 return acc.reverse();
             });
         }
-        return step(this, l, new Nil<_tuple.Tuple2>());
+        return step(this, l, new Nil<_tuple.Tuple2<T,U>>());
     }
 
     zipWithIndex(): IList<_tuple.Tuple2<T,number>> {

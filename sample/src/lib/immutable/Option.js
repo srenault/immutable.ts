@@ -1,4 +1,6 @@
 define(["require", "exports"], function(require, exports) {
+    
+
     function Option(a) {
         if (a != null || a != undefined) {
             return new Some(a);

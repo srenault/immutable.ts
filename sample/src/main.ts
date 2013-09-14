@@ -105,14 +105,16 @@ console.log(List(1,2).flatMap((t) => {
 
 console.log("dropRight", List(1,2,3,4).dropRigth(1).asArray());
 
-console.log("indexOf", List(1,2,3,4).indexOf(2));
+console.log("indexOf => 1", List(1,2,3,4,2).indexOf(2));
 
-console.log("indexOfAfter", List(1,2,3,4,2).indexOfAfter(2, 2));
+console.log("indexOfAfter => 4", List(1,2,3,4,2,4,2).indexOfAfter(2, 2));
 
-console.log("indexWhere", List(1,2,3,4,2).indexWhere((t) => { return t == 2; }));
-
-console.log("indexWhereAfter", List(1,2,3,4,2).indexWhere((t) => { return t == 2; }), 2);
+console.log("indexWhere => 1", List(1,2,3,4,2).indexWhere((t) => { return t == 2; }));
 
 console.log("padTo", List(1,2,3,4,5).padTo(10, 0).asArray());
 
 console.log("span", List(1,2,3,4).span((t) => { return t < 3; }));
+
+//console.log("sum", List(1,2,3,4).sum());
+
+//console.log("sum", List("1","2","3","4").sum());

@@ -1,7 +1,8 @@
-define(["require", "exports", './Option', './Tuple'], function(require, exports, ___option__, ___tuple__) {
+define(["require", "exports", './Traversable', './Option', './Tuple', './Range'], function(require, exports, ___tr__, ___option__, ___tuple__, ___range__) {
+    var _tr = ___tr__;
     var _option = ___option__;
     var _tuple = ___tuple__;
-    var _mutable = module("../mutable/collections");
+    var _range = ___range__;
 
     function List() {
         var as = [];
@@ -42,6 +43,10 @@ define(["require", "exports", './Option', './Tuple'], function(require, exports,
 
         Nil.prototype.isEmpty = function () {
             return true;
+        };
+
+        Nil.prototype.nonEmpty = function () {
+            return !this.isEmpty();
         };
 
         Nil.prototype.length = function () {
@@ -85,6 +90,10 @@ define(["require", "exports", './Option', './Tuple'], function(require, exports,
         };
 
         Nil.prototype.flatMap = function (f) {
+            return new Nil();
+        };
+
+        Nil.prototype.flatten = function () {
             return new Nil();
         };
 
@@ -143,6 +152,10 @@ define(["require", "exports", './Option', './Tuple'], function(require, exports,
             return this;
         };
 
+        Nil.prototype.dropRigth = function (n) {
+            throw new Error("dropRight of empty list");
+        };
+
         Nil.prototype.get = function (n) {
             throw new Error("get of empty list");
         };
@@ -165,6 +178,47 @@ define(["require", "exports", './Option', './Tuple'], function(require, exports,
 
         Nil.prototype.distinct = function () {
             return new Nil();
+        };
+
+        Nil.prototype.indexOf = function (t) {
+            return -1;
+        };
+
+        Nil.prototype.indexOfAfter = function (t, from) {
+            return -1;
+        };
+
+        Nil.prototype.indexWhere = function (f) {
+            return -1;
+        };
+
+        Nil.prototype.indexWhereAfter = function (f, from) {
+            return -1;
+        };
+
+        Nil.prototype.lastIndexOf = function (t) {
+            return -1;
+        };
+
+        Nil.prototype.lastIndexOfAfter = function (t, end) {
+            return -1;
+        };
+
+        Nil.prototype.lastIndexWhere = function (f) {
+            return -1;
+        };
+
+        Nil.prototype.lastIndexWhereAfter = function (f, end) {
+            return -1;
+        };
+
+        Nil.prototype.padTo = function (len, t) {
+            return padTo1(this, len, t);
+        };
+
+        Nil.prototype.span = function (f) {
+            var nil = new Nil();
+            return new _tuple.Tuple2(nil, nil);
         };
         return Nil;
     })();
@@ -197,6 +251,10 @@ define(["require", "exports", './Option', './Tuple'], function(require, exports,
 
         Cons.prototype.isEmpty = function () {
             return false;
+        };
+
+        Cons.prototype.nonEmpty = function () {
+            return !this.isEmpty();
         };
 
         Cons.prototype.length = function () {
@@ -244,7 +302,24 @@ define(["require", "exports", './Option', './Tuple'], function(require, exports,
         };
 
         Cons.prototype.flatMap = function (f) {
-            return concat1(this.map(f));
+            return this.map(f).flatten();
+        };
+
+        Cons.prototype.flatten = function () {
+            return this.foldLeft(new Nil(), function (acc, t) {
+                if (_tr.isList(t)) {
+                    var l = t;
+                    return acc.append(l);
+                } else if (_tr.isOption(t)) {
+                    var o = t;
+                    if (o.isDefined()) {
+                        return acc.appendOne(o.get());
+                    } else
+                        return acc;
+                } else {
+                    return acc.appendOne(t);
+                }
+            });
         };
 
         Cons.prototype.filter = function (f) {
@@ -316,10 +391,7 @@ define(["require", "exports", './Option', './Tuple'], function(require, exports,
         };
 
         Cons.prototype.zipWithIndex = function () {
-            var indexes = exports.List(0);
-            for (var i = 1; i < this.length(); i++) {
-                indexes = indexes.appendOne(i);
-            }
+            var indexes = new _range.Range(0, this.length()).toList();
             return this.zip(indexes);
         };
 
@@ -362,6 +434,16 @@ define(["require", "exports", './Option', './Tuple'], function(require, exports,
                 }
                 return new Cons(t, acc);
             }).reverse();
+        };
+
+        Cons.prototype.dropRigth = function (n) {
+            var self = this;
+            return this.zipWithIndex().foldRight(new Nil(), function (t, acc) {
+                if (t._2 == (self.length() - n)) {
+                    return acc;
+                }
+                return new Cons(t._1, acc);
+            });
         };
 
         Cons.prototype.get = function (n) {
@@ -426,8 +508,87 @@ define(["require", "exports", './Option', './Tuple'], function(require, exports,
                 }
             });
         };
+
+        Cons.prototype.indexOf = function (t) {
+            return this.indexWhere(function (t1) {
+                return t == t1;
+            });
+        };
+
+        Cons.prototype.indexOfAfter = function (t, from) {
+            return this.indexWhereAfter(function (t1) {
+                return t == t1;
+            }, from);
+        };
+
+        Cons.prototype.indexWhere = function (f) {
+            return this.zipWithIndex().foldLeft(-1, function (acc, t1) {
+                if (acc == -1 && f(t1._1)) {
+                    return t1._2;
+                } else
+                    return acc;
+            });
+        };
+
+        Cons.prototype.indexWhereAfter = function (f, from) {
+            return this.zipWithIndex().foldLeft(-1, function (acc, t1) {
+                if (acc == -1 && f(t1._1) && from < t1._2) {
+                    return t1._2;
+                } else
+                    return acc;
+            });
+        };
+
+        Cons.prototype.lastIndexOf = function (t) {
+            return this.lastIndexWhere(function (t1) {
+                return t == t1;
+            });
+        };
+
+        Cons.prototype.lastIndexOfAfter = function (t, end) {
+            return this.lastIndexWhereAfter(function (t1) {
+                return t == t1;
+            }, end);
+        };
+
+        Cons.prototype.lastIndexWhere = function (f) {
+            return this.zipWithIndex().foldLeft(-1, function (acc, t1) {
+                if (f(t1._1)) {
+                    return t1._2;
+                } else
+                    return acc;
+            });
+        };
+
+        Cons.prototype.lastIndexWhereAfter = function (f, end) {
+            return this.zipWithIndex().foldLeft(-1, function (acc, t1) {
+                if (f(t1._1) && end >= t1._2) {
+                    return t1._2;
+                } else
+                    return acc;
+            });
+        };
+
+        Cons.prototype.padTo = function (len, t) {
+            return padTo1(this, len, t);
+        };
+
+        Cons.prototype.span = function (f) {
+            var nil = new Nil();
+            var z = new _tuple.Tuple2(nil, nil);
+            return this.foldLeft(z, function (acc, t) {
+                if (f(t)) {
+                    var left = acc._1.appendOne(t);
+                    return new _tuple.Tuple2(left, acc._2);
+                } else {
+                    var right = acc._2.appendOne(t);
+                    return new _tuple.Tuple2(acc._1, right);
+                }
+            });
+        };
         return Cons;
     })();
+    exports.Cons = Cons;
 
     function append1(l1, l2) {
         return foldRight1(l1, l2, function (t, acc) {
@@ -463,5 +624,17 @@ define(["require", "exports", './Option', './Tuple'], function(require, exports,
         return l.foldLeft(new Nil(), function (acc, t) {
             return new Cons(t, acc);
         });
+    }
+
+    function padTo1(l, len, t) {
+        if (l.length() < len) {
+            var rest = len - l.length();
+            var pad = new _range.Range(0, rest).toList().map(function (_) {
+                return t;
+            });
+            return l.append(pad);
+        } else {
+            return l;
+        }
     }
 });

@@ -7,7 +7,7 @@ module.exports = function(grunt) {
                 livereload: true
             },
             scripts: {
-                files: ['lib/**/*.ts', 'sample/src/main.ts'],
+                files: ['src/lib/**/*.ts', 'sample/src/main.ts'],
                 tasks: ['copy:lib', 'typescript:sample'],
                 options: {
                 }
@@ -15,8 +15,8 @@ module.exports = function(grunt) {
         },
         typescript: {
             lib: {
-                src: ['lib/**/*.ts'],
-                dest: 'js/',
+                src: ['src/lib/**/*.ts'],
+                dest: 'src/test/lib/',
                 options: {
                     module: 'amd',
                     base_path: 'lib'
@@ -33,7 +33,7 @@ module.exports = function(grunt) {
         },
         copy: {
             lib: {
-                cwd: 'lib',
+                cwd: 'src/lib',
                 src: ['**'],
                 dest: 'sample/src/lib',
                 flatten: false,
@@ -45,10 +45,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-typescript');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-mocha');
 
     // Here we  go !
     grunt.registerTask('default', ['copy:lib', 'typescript:sample']);
     grunt.registerTask('dev', ['copy:lib', 'typescript:sample', 'watch']);
     grunt.registerTask('lib', ['typescript:lib']);
     grunt.registerTask('sample', ['copy:lib', 'typescript:sample']);
+    grunt.registerTask('copylib', ['copy:lib']);
 };

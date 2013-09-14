@@ -92,9 +92,19 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     indexWhereAfter(f: (t: T) => boolean, from: number): number;
 
-    padTo(len: number, t: T): IList<T>
+    lastIndexOf(t: T): number;
 
-    span(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>>
+    lastIndexOfAfter(t: T, end: number): number;
+
+    lastIndexWhere(f: (t: T) => boolean): number;
+
+    lastIndexWhereAfter(f: (t: T) => boolean, from: number): number;
+
+    padTo(len: number, t: T): IList<T>;
+
+    span(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>>;
+
+    //sum(): T
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -285,6 +295,22 @@ export class Nil<T> implements IList<T> {
         return -1;
     }
 
+    lastIndexOf(t: T): number {
+        return - 1;
+    }
+
+    lastIndexOfAfter(t: T, end: number): number {
+        return -1;
+    }
+
+    lastIndexWhere(f: (t: T) => boolean): number {
+        return -1;
+    }
+
+    lastIndexWhereAfter(f: (t: T) => boolean, end: number): number {
+        return -1;
+    }
+
     padTo(len: number, t: T): IList<T> {
         return padTo1(this, len, t);
     }
@@ -293,6 +319,10 @@ export class Nil<T> implements IList<T> {
         var nil = new Nil<T>();
         return new _tuple.Tuple2<IList<T>,IList<T>>(nil, nil);
     }
+
+    // sum(): T {
+    //     return sum1(this);
+    // }
 }
 
 export class Cons<T> implements IList<T> {
@@ -589,7 +619,7 @@ export class Cons<T> implements IList<T> {
 
     indexWhere(f: (t: T) => boolean): number {
         return this.zipWithIndex().foldLeft(-1, (acc, t1) => {
-            if(f(t1._1)) {
+            if(acc == -1 && f(t1._1)) {
                 return t1._2;
             } else return acc;
         });
@@ -597,7 +627,35 @@ export class Cons<T> implements IList<T> {
 
     indexWhereAfter(f: (t: T) => boolean, from: number): number {
         return this.zipWithIndex().foldLeft(-1, (acc, t1) => {
-            if(f(t1._1) && from < t1._2) {
+            if(acc == -1 && f(t1._1) && from < t1._2) {
+                return t1._2;
+            } else return acc;
+        });
+    }
+
+    lastIndexOf(t: T): number {
+        return this.lastIndexWhere((t1) => {
+            return t == t1;
+        });
+    }
+
+    lastIndexOfAfter(t: T, end: number): number {
+        return this.lastIndexWhereAfter((t1) => {
+            return t == t1;
+        }, end);
+    }
+
+    lastIndexWhere(f: (t: T) => boolean): number {
+        return this.zipWithIndex().foldLeft(-1, (acc, t1) => {
+            if(f(t1._1)) {
+                return t1._2;
+            } else return acc;
+        });
+    }
+
+    lastIndexWhereAfter(f: (t: T) => boolean, end: number): number {
+        return this.zipWithIndex().foldLeft(-1, (acc, t1) => {
+            if(f(t1._1) && end >= t1._2) {
                 return t1._2;
             } else return acc;
         });
@@ -620,6 +678,10 @@ export class Cons<T> implements IList<T> {
             }
         });
     }
+
+    // sum(): T {
+    //     return sum1(this);
+    // }
 }
 
 function append1<T>(l1: IList<T>, l2: IList<T>): IList<T> {
@@ -669,6 +731,21 @@ function padTo1<T>(l: IList<T>, len: number, t: T): IList<T> {
         return l;
     }
 }
+
+// function typeofNumericList<T>(l: IList<T>): boolean {
+//     return (l instanceof Nil<number> || l instanceof Cons<number>);
+// }
+
+// function sum1<T>(l: IList<T>): T {
+//     if(typeofNumericList<T>(l)) {
+//         var s = l.foldLeft<number>(0, (acc, n) => {
+//             return acc + (<number><any>n);
+//         });
+//         return <T><any>s;
+//     } else {
+//         throw new Error("sum on non number list");
+//     } 
+// }
 
 // function occurences1<T>(l: IList<T>): {} {
 //     //Typescript.Collections.HashTable;

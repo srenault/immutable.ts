@@ -1,7 +1,9 @@
-define(["require", "exports", "lib/immutable/package"], function(require, exports, __Immutable__) {
-    var Immutable = __Immutable__;
-    var List = Immutable.List;
-    var Option = Immutable.Option;
+define(["require", "exports", "lib/immutable/List", './lib/immutable/Option'], function(require, exports, ___list__, ___option__) {
+    var _list = ___list__;
+    var _option = ___option__;
+
+    var List = _list.List;
+    var Option = _option.Option;
 
     var l1 = List(1, 2, 3);
     var l2 = List(4, 5, 6);
@@ -114,4 +116,29 @@ define(["require", "exports", "lib/immutable/package"], function(require, export
     console.log("dropWhile", List(1, 2, 3, 4).dropWhile(function (t) {
         return t < 3;
     }).asArray());
+
+    console.log("flatten", List(List(1, 2), List(3, 4)).flatten().asArray());
+
+    console.log("flatten", List(new _option.None(), new _option.Some(1)).flatten().asArray());
+
+    console.log("flatMap");
+    console.log(List(1, 2).flatMap(function (t) {
+        return List(3, 4);
+    }).asArray());
+
+    console.log("dropRight", List(1, 2, 3, 4).dropRigth(1).asArray());
+
+    console.log("indexOf => 1", List(1, 2, 3, 4, 2).indexOf(2));
+
+    console.log("indexOfAfter => 4", List(1, 2, 3, 4, 2, 4, 2).indexOfAfter(2, 2));
+
+    console.log("indexWhere => 1", List(1, 2, 3, 4, 2).indexWhere(function (t) {
+        return t == 2;
+    }));
+
+    console.log("padTo", List(1, 2, 3, 4, 5).padTo(10, 0).asArray());
+
+    console.log("span", List(1, 2, 3, 4).span(function (t) {
+        return t < 3;
+    }));
 });

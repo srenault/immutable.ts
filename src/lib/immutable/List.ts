@@ -65,6 +65,8 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     filter(f: (t: T) => boolean): IList<T>;
 
+    collect<U>(f: (t: T) => _option.IOption<U>): IList<U>;
+
     find(f: (t: T) => boolean): _option.IOption<T>;
 
     filterNot(f: (t: T) => boolean): IList<T>;
@@ -219,6 +221,10 @@ export class Nil<T> implements IList<T> {
 
     filter(f: (t: T) => boolean): IList<T> {
         return this;
+    }
+
+    collect<U>(f: (t: T) => _option.IOption<U>): IList<U> {
+        return new Nil<U>();
     }
 
     find(f: (t: T) => boolean): _option.IOption<T> {
@@ -450,6 +456,16 @@ export class Cons<T> implements IList<T> {
             } else {
                 return acc;
             }
+        }).reverse();
+    }
+
+    collect<U>(f: (t: T) => _option.IOption<U>): IList<U> {
+        return this.foldLeft<IList<U>>(new Nil<U>(), (acc, t) => {
+            return f(t).map((u) => {
+                return new Cons<U>(u, acc);
+            }).getOrElse(() => {
+                return acc;
+            });
         }).reverse();
     }
 

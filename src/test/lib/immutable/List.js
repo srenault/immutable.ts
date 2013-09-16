@@ -122,6 +122,10 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
             return this;
         };
 
+        Nil.prototype.collect = function (f) {
+            return new Nil();
+        };
+
         Nil.prototype.find = function (f) {
             return new _option.None();
         };
@@ -355,6 +359,16 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
                 } else {
                     return acc;
                 }
+            }).reverse();
+        };
+
+        Cons.prototype.collect = function (f) {
+            return this.foldLeft(new Nil(), function (acc, t) {
+                return f(t).map(function (u) {
+                    return new Cons(u, acc);
+                }).getOrElse(function () {
+                    return acc;
+                });
             }).reverse();
         };
 

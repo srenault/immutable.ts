@@ -158,7 +158,7 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         };
 
         Nil.prototype.take = function (n) {
-            throw new exports.Exceptions.noSuchElement("take of empty List");
+            return this;
         };
 
         Nil.prototype.takeWhile = function (f) {
@@ -166,23 +166,24 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         };
 
         Nil.prototype.drop = function (n) {
-            throw new Error("drop of empty list");
+            return this;
         };
 
         Nil.prototype.dropWhile = function (f) {
             return this;
         };
 
-        Nil.prototype.dropRigth = function (n) {
-            throw new Error("dropRight of empty list");
+        Nil.prototype.dropRight = function (n) {
+            return this;
         };
 
         Nil.prototype.get = function (n) {
-            throw new Error("get of empty list");
+            throw new exports.Exceptions.indexOutOfBounds(n.toString());
         };
 
         Nil.prototype.splitAt = function (n) {
-            throw new Error("split of empty list");
+            var emptyList = new Nil();
+            return new _tuple.Tuple2(emptyList, emptyList);
         };
 
         Nil.prototype.count = function (f) {
@@ -240,6 +241,10 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         Nil.prototype.span = function (f) {
             var nil = new Nil();
             return new _tuple.Tuple2(nil, nil);
+        };
+
+        Nil.prototype.forall = function (f) {
+            return true;
         };
         return Nil;
     })();
@@ -457,10 +462,10 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
             }).reverse();
         };
 
-        Cons.prototype.dropRigth = function (n) {
+        Cons.prototype.dropRight = function (n) {
             var self = this;
             return this.zipWithIndex().foldRight(new Nil(), function (t, acc) {
-                if (t._2 == (self.length() - n)) {
+                if (t._2 >= n) {
                     return acc;
                 }
                 return new Cons(t._1, acc);
@@ -583,7 +588,7 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
 
         Cons.prototype.lastIndexWhereAfter = function (f, end) {
             return this.zipWithIndex().foldLeft(-1, function (acc, t1) {
-                if (f(t1._1) && end >= t1._2) {
+                if (f(t1._1) && end > t1._2) {
                     return t1._2;
                 } else
                     return acc;
@@ -605,6 +610,12 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
                     var right = acc._2.appendOne(t);
                     return new _tuple.Tuple2(acc._1, right);
                 }
+            });
+        };
+
+        Cons.prototype.forall = function (f) {
+            return this.foldLeft(true, function (acc, t) {
+                return acc && f(t);
             });
         };
         return Cons;

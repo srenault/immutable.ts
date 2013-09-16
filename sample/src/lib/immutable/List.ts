@@ -101,7 +101,7 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     drop(n: number): IList<T>;
 
-    dropRigth(n: number): IList<T>;
+    dropRight(n: number): IList<T>;
 
     dropWhile(f: (t: T) => boolean): IList<T>;
 
@@ -125,7 +125,7 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     span(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>>;
 
-    //sum(): T
+    forall(f: (t: T) => boolean): boolean;
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -257,7 +257,7 @@ export class Nil<T> implements IList<T> {
     }
 
     take(n: number): IList<T> {
-        throw new Exceptions.noSuchElement("take of empty List");
+        return this;
     }
 
     takeWhile(f: (t: T) => boolean): IList<T> {
@@ -265,23 +265,24 @@ export class Nil<T> implements IList<T> {
     }
 
     drop(n: number): IList<T> {
-        throw new Error("drop of empty list");
+        return this;
     }
 
     dropWhile(f: (t: T) => boolean): IList<T> {
         return this;
     }
 
-    dropRigth(n: number): IList<T> {
-        throw new Error("dropRight of empty list");
+    dropRight(n: number): IList<T> {
+        return this;
     }
 
     get(n: number): T {
-        throw new Error("get of empty list");
+        throw new Exceptions.indexOutOfBounds(n.toString());
     }
 
     splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>> {
-        throw new Error("split of empty list");
+        var emptyList = new Nil<T>();
+        return new _tuple.Tuple2<IList<T>, IList<T>>(emptyList, emptyList);
     }
 
     count(f: (t) => boolean): number {
@@ -341,9 +342,9 @@ export class Nil<T> implements IList<T> {
         return new _tuple.Tuple2<IList<T>,IList<T>>(nil, nil);
     }
 
-    // sum(): T {
-    //     return sum1(this);
-    // }
+    forall(f: (t: T) => boolean): boolean {
+        return true;
+    }
 }
 
 export class Cons<T> implements IList<T> {
@@ -554,10 +555,10 @@ export class Cons<T> implements IList<T> {
         }).reverse();
     }
 
-    dropRigth(n: number): IList<T> {
+    dropRight(n: number): IList<T> {
         var self = this;
         return this.zipWithIndex().foldRight<IList<T>>(new Nil<T>(), (t, acc) => {
-            if(t._2 == (self.length() - n)) {
+            if(t._2 >= n) {
                 return acc;
             }
             return new Cons<T>(t._1, acc);
@@ -676,7 +677,7 @@ export class Cons<T> implements IList<T> {
 
     lastIndexWhereAfter(f: (t: T) => boolean, end: number): number {
         return this.zipWithIndex().foldLeft(-1, (acc, t1) => {
-            if(f(t1._1) && end >= t1._2) {
+            if(f(t1._1) && end > t1._2) {
                 return t1._2;
             } else return acc;
         });
@@ -700,9 +701,11 @@ export class Cons<T> implements IList<T> {
         });
     }
 
-    // sum(): T {
-    //     return sum1(this);
-    // }
+    forall(f: (t: T) => boolean): boolean {
+        return this.foldLeft(true, (acc, t) => {
+            return acc && f(t);
+        });
+    }
 }
 
 function append1<T>(l1: IList<T>, l2: IList<T>): IList<T> {
@@ -752,27 +755,3 @@ function padTo1<T>(l: IList<T>, len: number, t: T): IList<T> {
         return l;
     }
 }
-
-// function typeofNumericList<T>(l: IList<T>): boolean {
-//     return (l instanceof Nil<number> || l instanceof Cons<number>);
-// }
-
-// function sum1<T>(l: IList<T>): T {
-//     if(typeofNumericList<T>(l)) {
-//         var s = l.foldLeft<number>(0, (acc, n) => {
-//             return acc + (<number><any>n);
-//         });
-//         return <T><any>s;
-//     } else {
-//         throw new Error("sum on non number list");
-//     } 
-// }
-
-// function occurences1<T>(l: IList<T>): {} {
-//     //Typescript.Collections.HashTable;
-//     var keysValues = {};
-//     l.foreach((t) => {
-//         keysValues[t] = keysValues[t] ? keysValues[t] + 1 : 1;
-//     });
-//     return keysValues;
-// }

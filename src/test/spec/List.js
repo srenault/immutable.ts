@@ -161,6 +161,16 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
             });
         });
 
+        describe('reduceLeftOption', function() {
+            it("should reduces the elements of the List, going left to right", function() {
+                var sum = data.nonEmptyList.reduceLeftOption(function(t, acc) {
+                    return acc + t;
+                });
+                expect(sum).to.be.an.instanceof(Some);
+                expect(sum).to.have.deep.property('t', 10);
+            });
+        });
+
         describe('reduceRight', function() {
             it("should throw NoSuchElementError on empty List", function() {
                 expect(data.emptyList.reduceRight).to.throw(Exceptions.NoSuchElementError)
@@ -170,6 +180,16 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
                 expect(data.nonEmptyList.reduceRight(function(t, acc) {
                     return acc + t;
                 })).to.equal(10);
+            });
+        });
+
+        describe('reduceRightOption', function() {
+            it("should reduces the elements of the List, going right to left", function() {
+                var sum = data.nonEmptyList.reduceRightOption(function(t, acc) {
+                    return acc + t;
+                });
+                expect(sum).to.be.an.instanceof(Some);
+                expect(sum).to.have.deep.property('t', 10);
             });
         });
 

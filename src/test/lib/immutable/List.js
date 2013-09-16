@@ -86,8 +86,16 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
             throw new exports.Exceptions.noSuchElement("reduceRight of empty List");
         };
 
+        Nil.prototype.reduceRightOption = function (f) {
+            return new _option.None();
+        };
+
         Nil.prototype.reduceLeft = function (f) {
             throw new exports.Exceptions.noSuchElement("reduceLeft of empty List");
+        };
+
+        Nil.prototype.reduceLeftOption = function (f) {
+            return new _option.None();
         };
 
         Nil.prototype.appendOne = function (t) {
@@ -319,9 +327,17 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
             return this.tail().foldRight(z, f);
         };
 
+        Cons.prototype.reduceRightOption = function (f) {
+            return new _option.Some(this.reduceRight(f));
+        };
+
         Cons.prototype.reduceLeft = function (f) {
             var z = this.head();
             return this.tail().foldLeft(z, f);
+        };
+
+        Cons.prototype.reduceLeftOption = function (f) {
+            return new _option.Some(this.reduceLeft(f));
         };
 
         Cons.prototype.appendOne = function (t) {

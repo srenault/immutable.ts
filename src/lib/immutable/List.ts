@@ -47,7 +47,11 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     reduceRight<U>(f: (t: T, acc: U) => U): U;
 
+    reduceRightOption<U>(f: (t: T, acc: U) => U): _option.IOption<U>;
+
     reduceLeft<U>(f: (acc: U, t: T) => U): U;
+
+    reduceLeftOption<U>(f: (acc: U, t: T) => U): _option.IOption<U>;
 
     appendOne(t: T): IList<T>;
 
@@ -193,8 +197,16 @@ export class Nil<T> implements IList<T> {
         throw new Exceptions.noSuchElement("reduceRight of empty List");
     }
 
+    reduceRightOption<U>(f: (t: T, acc: U) => U): _option.IOption<U> {
+        return new _option.None<U>();
+    }
+
     reduceLeft<U> (f: (t: T, acc: U) => U): U {
         throw new Exceptions.noSuchElement("reduceLeft of empty List");
+    }
+
+    reduceLeftOption<U>(f: (acc: U, t: T) => U): _option.IOption<U> {
+        return new _option.None<U>();
     }
 
     appendOne(t: T): IList<T> {
@@ -423,9 +435,17 @@ export class Cons<T> implements IList<T> {
         return this.tail().foldRight(z, f);
     }
 
+    reduceRightOption<U>(f: (t: T, acc: U) => U): _option.IOption<U> {
+        return new _option.Some<U>(this.reduceRight(f));
+    }
+
     reduceLeft<U> (f: (acc: U, t: T) => U): U {
         var z = <U><any>this.head();
         return this.tail().foldLeft(z, f);
+    }
+
+    reduceLeftOption<U> (f: (acc: U, t: T) => U): _option.IOption<U> {
+        return new _option.Some<U>(this.reduceLeft(f));
     }
 
     appendOne(t: T): IList<T> {

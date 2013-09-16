@@ -133,7 +133,7 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     forall(f: (t: T) => boolean): boolean;
 
-    //lift(): (Int) => _option.IOption<T>;
+    lift(): (number) => _option.IOption<T>;
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -365,6 +365,12 @@ export class Nil<T> implements IList<T> {
 
     forall(f: (t: T) => boolean): boolean {
         return true;
+    }
+
+    lift(): (number) => _option.IOption<T> {
+        return (n: number) => {
+            return new _option.None<T>();
+        }
     }
 }
 
@@ -605,18 +611,15 @@ export class Cons<T> implements IList<T> {
     }
 
     get(n: number): T {
-        var r;
-        if(n > 0) {
-            r = this.zipWithIndex().reduceRight((t, acc) => {
-                if(t._2 == n) {
-                    return t._1;
-                } else {
-                    return null;
-                }
-            });
-            if(r) return r;
-        }
-        throw new Exceptions.indexOutOfBounds(n.toString());
+        return this.zipWithIndex().foldLeft(new _option.None<T>(), (acc, t) => {
+            if(t._2 == n) {
+                return new _option.Some(t._1);
+            } else {
+                return acc;
+            }
+        }).getOrElse(() => {
+            throw new Exceptions.indexOutOfBounds(n.toString());
+        });
     }
 
     splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>> {
@@ -758,6 +761,13 @@ export class Cons<T> implements IList<T> {
         return this.foldLeft(true, (acc, t) => {
             return acc && f(t);
         });
+    }
+
+    lift(): (number) => _option.IOption<T> {
+        var self = this;
+        return (n: number) => {
+            return _option.Option(self.get(n));
+        };
     }
 }
 

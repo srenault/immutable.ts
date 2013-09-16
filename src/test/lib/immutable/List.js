@@ -259,6 +259,12 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         Nil.prototype.forall = function (f) {
             return true;
         };
+
+        Nil.prototype.lift = function () {
+            return function (n) {
+                return new _option.None();
+            };
+        };
         return Nil;
     })();
     exports.Nil = Nil;
@@ -505,19 +511,15 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         };
 
         Cons.prototype.get = function (n) {
-            var r;
-            if (n > 0) {
-                r = this.zipWithIndex().reduceRight(function (t, acc) {
-                    if (t._2 == n) {
-                        return t._1;
-                    } else {
-                        return null;
-                    }
-                });
-                if (r)
-                    return r;
-            }
-            throw new exports.Exceptions.indexOutOfBounds(n.toString());
+            return this.zipWithIndex().foldLeft(new _option.None(), function (acc, t) {
+                if (t._2 == n) {
+                    return new _option.Some(t._1);
+                } else {
+                    return acc;
+                }
+            }).getOrElse(function () {
+                throw new exports.Exceptions.indexOutOfBounds(n.toString());
+            });
         };
 
         Cons.prototype.splitAt = function (n) {
@@ -663,6 +665,13 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
             return this.foldLeft(true, function (acc, t) {
                 return acc && f(t);
             });
+        };
+
+        Cons.prototype.lift = function () {
+            var self = this;
+            return function (n) {
+                return _option.Option(self.get(n));
+            };
         };
         return Cons;
     })();

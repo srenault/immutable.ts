@@ -349,7 +349,7 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
             });
 
             it("should return the n element", function() {
-                expect(data.nonEmptyList.head()).to.equal(1);
+                expect(data.nonEmptyList.get(1)).to.equal(2);
             });
         });
 
@@ -498,6 +498,13 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
                     return (t % 2) == 0;
                 });
                 expect(arrayEquals(r._1.asArray(), [2,4]) && arrayEquals(r._2.asArray(), [1,3])).to.be.true;
+            });
+        });
+
+        describe('lift', function() {
+            it("should turn this function into another function returning an Option result", function() {
+                expect(data.nonEmptyList.lift()(3)).to.be.an.instanceof(Some);
+                expect(data.nonEmptyList.lift()(3)).to.have.deep.property('t', 4);
             });
         });
     });

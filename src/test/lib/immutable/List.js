@@ -126,6 +126,10 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
             return new Nil();
         };
 
+        Nil.prototype.collectFirst = function (f) {
+            return new _option.None();
+        };
+
         Nil.prototype.find = function (f) {
             return new _option.None();
         };
@@ -370,6 +374,15 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
                     return acc;
                 });
             }).reverse();
+        };
+
+        Cons.prototype.collectFirst = function (f) {
+            return this.foldLeft(new _option.None(), function (acc, t) {
+                if (!acc.isDefined()) {
+                    return f(t);
+                } else
+                    return acc;
+            });
         };
 
         Cons.prototype.find = function (f) {

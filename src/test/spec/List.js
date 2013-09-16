@@ -478,5 +478,18 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
                 expect(isEquals).to.be.true;
             });
         });
+
+        describe('collectFirst', function() {
+            it("should find the first element of the List for which the given function is defined, and applies the function to it.", function() {
+                var result = data.nonEmptyList.collectFirst(function(t) {
+                    if(t == 2) {
+                        return new Some(t.toString());
+                    } else {
+                        return new None();
+                    }
+                });
+                expect(result).to.be.an.instanceof(Some);
+            });
+        });
     });
 });

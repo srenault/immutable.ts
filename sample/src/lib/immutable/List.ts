@@ -129,7 +129,11 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     span(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>>;
 
+    partition(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>>;
+
     forall(f: (t: T) => boolean): boolean;
+
+    //lift(): (Int) => _option.IOption<T>;
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -350,6 +354,11 @@ export class Nil<T> implements IList<T> {
     }
 
     span(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>> {
+        var nil = new Nil<T>();
+        return new _tuple.Tuple2<IList<T>,IList<T>>(nil, nil);
+    }
+
+    partition(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>> {
         var nil = new Nil<T>();
         return new _tuple.Tuple2<IList<T>,IList<T>>(nil, nil);
     }
@@ -718,6 +727,20 @@ export class Cons<T> implements IList<T> {
     }
 
     span(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>> {
+        var nil = new Nil<T>();
+        var z = new _tuple.Tuple2<IList<T>,IList<T>>(nil, nil);
+        return this.foldLeft(z, (acc, t) => {
+            if(f(t) && acc._2.isEmpty()) {
+                var left = acc._1.appendOne(t);
+                return new _tuple.Tuple2<IList<T>,IList<T>>(left, acc._2);
+            } else {
+                var right = acc._2.appendOne(t);
+                return new _tuple.Tuple2<IList<T>,IList<T>>(acc._1, right);
+            }
+        });
+    }
+
+    partition(f: (t: T) => boolean): _tuple.Tuple2<IList<T>, IList<T>> {
         var nil = new Nil<T>();
         var z = new _tuple.Tuple2<IList<T>,IList<T>>(nil, nil);
         return this.foldLeft(z, (acc, t) => {

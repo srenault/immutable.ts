@@ -491,5 +491,14 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
                 expect(result).to.be.an.instanceof(Some);
             });
         });
+
+        describe('partition', function() {
+            it("should partitions this list in two lists according to a predicate", function() {
+                var r = data.nonEmptyList.partition(function(t) {
+                    return (t % 2) == 0;
+                });
+                expect(arrayEquals(r._1.asArray(), [2,4]) && arrayEquals(r._2.asArray(), [1,3])).to.be.true;
+            });
+        });
     });
 });

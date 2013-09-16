@@ -251,6 +251,11 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
             return new _tuple.Tuple2(nil, nil);
         };
 
+        Nil.prototype.partition = function (f) {
+            var nil = new Nil();
+            return new _tuple.Tuple2(nil, nil);
+        };
+
         Nil.prototype.forall = function (f) {
             return true;
         };
@@ -627,6 +632,20 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         };
 
         Cons.prototype.span = function (f) {
+            var nil = new Nil();
+            var z = new _tuple.Tuple2(nil, nil);
+            return this.foldLeft(z, function (acc, t) {
+                if (f(t) && acc._2.isEmpty()) {
+                    var left = acc._1.appendOne(t);
+                    return new _tuple.Tuple2(left, acc._2);
+                } else {
+                    var right = acc._2.appendOne(t);
+                    return new _tuple.Tuple2(acc._1, right);
+                }
+            });
+        };
+
+        Cons.prototype.partition = function (f) {
             var nil = new Nil();
             var z = new _tuple.Tuple2(nil, nil);
             return this.foldLeft(z, function (acc, t) {

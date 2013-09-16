@@ -4,6 +4,19 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
     var _tuple = ___tuple__;
     var _range = ___range__;
 
+    exports.Exceptions = (function () {
+        return {
+            noSuchElement: function (message) {
+                function NoSuchElementError() {
+                    this.name = "NoSuchElementError";
+                    this.message = message || "";
+                }
+                NoSuchElementError.prototype = Error.prototype;
+                throw new NoSuchElementError();
+            }
+        };
+    })();
+
     function List() {
         var as = [];
         for (var _i = 0; _i < (arguments.length - 0); _i++) {
@@ -22,7 +35,7 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         function Nil() {
         }
         Nil.prototype.head = function () {
-            throw new Error("head of empty list");
+            throw new exports.Exceptions.noSuchElement("head of empty list");
         };
 
         Nil.prototype.last = function () {

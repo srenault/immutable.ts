@@ -16,7 +16,7 @@ module.exports = function(grunt) {
         typescript: {
             lib: {
                 src: ['src/lib/**/*.ts'],
-                dest: 'src/test/lib/',
+                dest: 'src/test/',
                 options: {
                     module: 'amd',
                     base_path: 'lib'
@@ -48,8 +48,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-mocha');
 
     // Here we  go !
-    grunt.registerTask('default', ['copy:lib', 'typescript:sample']);
-    grunt.registerTask('dev', ['copy:lib', 'typescript:sample', 'watch']);
+    grunt.registerTask('default', ['typescript:lib', 'copy:lib']);
+    grunt.registerTask('dev', ['typescript:lib', 'copy:lib', 'watch']);
     grunt.registerTask('lib', ['typescript:lib']);
     grunt.registerTask('sample', ['copy:lib', 'typescript:sample']);
     grunt.registerTask('copylib', ['copy:lib']);

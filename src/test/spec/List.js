@@ -583,5 +583,13 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
                 })).to.be.true;
             });
         });
+
+        describe('segmentLenght', function() {
+            it("should compute length of longest segment whose elements all satisfy some predicate", function() {
+                expect(List(2,3,4,5,-2,-1,0,1,2,3,4,5,-1,0,1,2,3,4,5).segmentLenght(function(t) {
+                    return t < 5;
+                })).to.equal(7);
+            });
+        });
     });
 });

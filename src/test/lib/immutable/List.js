@@ -1,8 +1,8 @@
 define(["require", "exports", './Traversable', './Option', './Tuple', './Range'], function(require, exports, _tr, _option, _tuple, _range) {
-    
-    
-    
-    
+
+
+
+
 
     exports.Exceptions = (function () {
         return {
@@ -304,6 +304,10 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
 
         Nil.prototype.corresponds = function (l, f) {
             return false;
+        };
+
+        Nil.prototype.segmentLenght = function (f, from) {
+            return 0;
         };
         return Nil;
     })();
@@ -781,6 +785,22 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
             } else {
                 return false;
             }
+        };
+
+        Cons.prototype.segmentLenght = function (f, from) {
+            var step = function (l, acc, max) {
+                return l.headOption().map(function (h) {
+                    if (f(h)) {
+                        var m = (acc + 1) > max ? (acc + 1) : max;
+                        return step(l.tail(), acc + 1, m);
+                    } else {
+                        return step(l.tail(), 0, max);
+                    }
+                }).getOrElse(function () {
+                    return max;
+                });
+            };
+            return step(this, 0, 0);
         };
         return Cons;
     })();

@@ -1,6 +1,6 @@
-define(["require", "exports", './Option', './List'], function(require, exports, ___option__, ___list__) {
-    var _option = ___option__;
-    var _list = ___list__;
+define(["require", "exports", './Option', './List'], function(require, exports, _option, _list) {
+    
+    
 
     function isTraversable(a) {
         return exports.isList(a) || exports.isOption(a);

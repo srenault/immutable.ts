@@ -1,5 +1,5 @@
-define(["require", "exports", './List'], function(require, exports, ___list__) {
-    var _list = ___list__;
+define(["require", "exports", './List'], function(require, exports, _list) {
+    
 
     var Range = (function () {
         function Range(from, to) {

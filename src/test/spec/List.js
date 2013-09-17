@@ -529,7 +529,7 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
         });
 
         describe('startsWith', function() {
-            it("should test whether this list contains the given sequence", function() {
+            it("should test whether this list starts with the given sequence", function() {
                 expect(data.nonEmptyList.startsWith(List(1,2))).to.be.true;
             });
         });
@@ -537,6 +537,12 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
         describe('startsWithAt', function() {
             it("should test whether this list contains the given sequence at a given index", function() {
                 expect(data.nonEmptyList.startsWithAt(List(3,4), 2)).to.be.true;
+            });
+        });
+
+        describe('endsWith', function() {
+            it("should test whether this list ends with the given sequence", function() {
+                expect(data.nonEmptyList.endsWith(List(3,4))).to.be.true;
             });
         });
     });

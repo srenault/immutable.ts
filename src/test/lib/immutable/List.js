@@ -1,8 +1,8 @@
-define(["require", "exports", './Traversable', './Option', './Tuple', './Range'], function(require, exports, ___tr__, ___option__, ___tuple__, ___range__) {
-    var _tr = ___tr__;
-    var _option = ___option__;
-    var _tuple = ___tuple__;
-    var _range = ___range__;
+define(["require", "exports", './Traversable', './Option', './Tuple', './Range'], function(require, exports, _tr, _option, _tuple, _range) {
+    
+    
+    
+    
 
     exports.Exceptions = (function () {
         return {
@@ -279,6 +279,10 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         };
 
         Nil.prototype.startsWithAt = function (that, offset) {
+            return false;
+        };
+
+        Nil.prototype.endsWith = function (that) {
             return false;
         };
         return Nil;
@@ -708,6 +712,10 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
                 var index = t._2;
                 return (index >= offset) ? acc && (tuple._1 == tuple._2) : true;
             });
+        };
+
+        Cons.prototype.endsWith = function (that) {
+            return this.reverse().startsWith(that.reverse());
         };
         return Cons;
     })();

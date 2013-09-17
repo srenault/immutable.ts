@@ -142,6 +142,8 @@ export interface IList<T> extends _tr.ITraversable<T> {
     startsWith(that: IList<T>): boolean
 
     startsWithAt(that: IList<T>, offset: number): boolean
+
+    endsWith(that: IList<T>): boolean
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -394,6 +396,10 @@ export class Nil<T> implements IList<T> {
     }
 
     startsWithAt(that: IList<T>, offset: number): boolean {
+        return false;
+    }
+
+    endsWith(that: IList<T>): boolean {
         return false;
     }
 }
@@ -812,6 +818,10 @@ export class Cons<T> implements IList<T> {
             var index = t._2;
             return (index >= offset) ? acc && (tuple._1 == tuple._2) : true;
         });
+    }
+
+    endsWith(that: IList<T>): boolean {
+        return this.reverse().startsWith(that.reverse());
     }
 }
 

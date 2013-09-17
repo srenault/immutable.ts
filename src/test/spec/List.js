@@ -591,5 +591,12 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
                 })).to.equal(7);
             });
         });
+
+        describe('slice', function() {
+            it("should select an interval of elements", function() {
+                var isEquals = arrayEquals(data.nonEmptyList.slice(1,3).asArray(), [2,3]);
+                expect(isEquals).to.be.true;
+            });
+        });
     });
 });

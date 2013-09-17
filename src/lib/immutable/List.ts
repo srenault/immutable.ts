@@ -156,6 +156,8 @@ export interface IList<T> extends _tr.ITraversable<T> {
     corresponds<U>(l: IList<U>, f: (a: T, b: U) => boolean): boolean;
 
     segmentLenght(f: (t: T) => boolean, from: number): number;
+
+    slice(from: number, until: number): IList<T>;
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -437,6 +439,10 @@ export class Nil<T> implements IList<T> {
 
     segmentLenght(f: (t: T) => boolean, from: number): number {
         return 0;
+    }
+
+    slice(from: number, until: number): IList<T> {
+        return this;
     }
 }
 
@@ -919,6 +925,16 @@ export class Cons<T> implements IList<T> {
             });
         }
         return step(this, 0, 0);
+    }
+
+    slice(from: number, until: number): IList<T> {
+        return this.zipWithIndex().foldLeft<IList<T>>(new Nil<T>(), (acc, t) => {
+            if(t._2 >= from && t._2 < until) {
+                return new Cons<T>(t._1, acc);
+            } else {
+                return acc;
+            }
+        }).reverse();
     }
 }
 

@@ -1,8 +1,8 @@
 define(["require", "exports", './Traversable', './Option', './Tuple', './Range'], function(require, exports, _tr, _option, _tuple, _range) {
-
-
-
-
+    
+    
+    
+    
 
     exports.Exceptions = (function () {
         return {
@@ -308,6 +308,10 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
 
         Nil.prototype.segmentLenght = function (f, from) {
             return 0;
+        };
+
+        Nil.prototype.slice = function (from, until) {
+            return this;
         };
         return Nil;
     })();
@@ -801,6 +805,16 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
                 });
             };
             return step(this, 0, 0);
+        };
+
+        Cons.prototype.slice = function (from, until) {
+            return this.zipWithIndex().foldLeft(new Nil(), function (acc, t) {
+                if (t._2 >= from && t._2 < until) {
+                    return new Cons(t._1, acc);
+                } else {
+                    return acc;
+                }
+            }).reverse();
         };
         return Cons;
     })();

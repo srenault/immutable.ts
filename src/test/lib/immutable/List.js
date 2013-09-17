@@ -273,6 +273,14 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
                 return new _option.None();
             };
         };
+
+        Nil.prototype.startsWith = function (that) {
+            return false;
+        };
+
+        Nil.prototype.startsWithAt = function (that, offset) {
+            return false;
+        };
         return Nil;
     })();
     exports.Nil = Nil;
@@ -688,6 +696,18 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
             return function (n) {
                 return _option.Option(self.get(n));
             };
+        };
+
+        Cons.prototype.startsWith = function (that) {
+            return this.startsWithAt(that, 0);
+        };
+
+        Cons.prototype.startsWithAt = function (that, offset) {
+            return this.zip(that).zipWithIndex().foldLeft(true, function (acc, t) {
+                var tuple = t._1;
+                var index = t._2;
+                return (index >= offset) ? acc && (tuple._1 == tuple._2) : true;
+            });
         };
         return Cons;
     })();

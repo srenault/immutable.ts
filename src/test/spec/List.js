@@ -527,5 +527,17 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
                 expect(data.nonEmptyList.lift()(3)).to.have.deep.property('t', 4);
             });
         });
+
+        describe('startsWith', function() {
+            it("should test whether this list contains the given sequence", function() {
+                expect(data.nonEmptyList.startsWith(List(1,2))).to.be.true;
+            });
+        });
+
+        describe('startsWithAt', function() {
+            it("should test whether this list contains the given sequence at a given index", function() {
+                expect(data.nonEmptyList.startsWithAt(List(3,4), 2)).to.be.true;
+            });
+        });
     });
 });

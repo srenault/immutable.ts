@@ -138,6 +138,10 @@ export interface IList<T> extends _tr.ITraversable<T> {
     forall(f: (t: T) => boolean): boolean;
 
     lift(): (number) => _option.IOption<T>;
+
+    startsWith(that: IList<T>): boolean
+
+    startsWithAt(that: IList<T>, offset: number): boolean
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -383,6 +387,14 @@ export class Nil<T> implements IList<T> {
         return (n: number) => {
             return new _option.None<T>();
         }
+    }
+
+    startsWith(that: IList<T>): boolean {
+        return false;
+    }
+
+    startsWithAt(that: IList<T>, offset: number): boolean {
+        return false;
     }
 }
 
@@ -788,6 +800,18 @@ export class Cons<T> implements IList<T> {
         return (n: number) => {
             return _option.Option(self.get(n));
         };
+    }
+
+    startsWith(that: IList<T>): boolean {
+        return this.startsWithAt(that, 0);
+    }
+
+    startsWithAt(that: IList<T>, offset: number): boolean {
+        return this.zip(that).zipWithIndex().foldLeft(true, (acc, t) => {
+            var tuple = t._1;
+            var index = t._2;
+            return (index >= offset) ? acc && (tuple._1 == tuple._2) : true;
+        });
     }
 }
 

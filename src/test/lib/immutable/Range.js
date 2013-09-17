@@ -4,7 +4,7 @@ define(["require", "exports", './List'], function(require, exports, _list) {
     var Range = (function () {
         function Range(from, to) {
             this.range = [];
-            for (var i = from; i < to; i++) {
+            for (var i = from; i <= to; i++) {
                 this.range.push(i);
             }
         }

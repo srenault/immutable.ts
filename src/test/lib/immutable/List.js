@@ -197,6 +197,10 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
             throw new exports.Exceptions.indexOutOfBounds(n.toString());
         };
 
+        Nil.prototype.getOption = function (n) {
+            return this.lift()(n);
+        };
+
         Nil.prototype.splitAt = function (n) {
             var emptyList = new Nil();
             return new _tuple.Tuple2(emptyList, emptyList);
@@ -283,6 +287,22 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         };
 
         Nil.prototype.endsWith = function (that) {
+            return false;
+        };
+
+        Nil.prototype.indices = function () {
+            return new _range.Range(0, 0);
+        };
+
+        Nil.prototype.isDefinedAt = function (n) {
+            return false;
+        };
+
+        Nil.prototype.containsSlice = function (sub) {
+            return false;
+        };
+
+        Nil.prototype.corresponds = function (l, f) {
             return false;
         };
         return Nil;
@@ -550,6 +570,10 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
             });
         };
 
+        Cons.prototype.getOption = function (n) {
+            return this.lift()(n);
+        };
+
         Cons.prototype.splitAt = function (n) {
             if (n > 0) {
                 var z = new _tuple.Tuple2(new Nil(), new Nil());
@@ -717,6 +741,47 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         Cons.prototype.endsWith = function (that) {
             return this.reverse().startsWith(that.reverse());
         };
+
+        Cons.prototype.indices = function () {
+            return new _range.Range(0, this.length() - 1);
+        };
+
+        Cons.prototype.isDefinedAt = function (n) {
+            try  {
+                return !!this.get(n);
+            } catch (e) {
+                return false;
+            }
+        };
+
+        Cons.prototype.containsSlice = function (sub) {
+            var step = function (l, sub) {
+                if (l.nonEmpty()) {
+                    if (l.startsWith(sub)) {
+                        return true;
+                    } else {
+                        return step(l.tail(), sub);
+                    }
+                } else {
+                    return false;
+                }
+            };
+            return step(this, sub);
+        };
+
+        Cons.prototype.corresponds = function (l, f) {
+            if (this.length() >= l.length()) {
+                return this.zip(l).foldLeft(true, function (acc, t) {
+                    if (acc) {
+                        return f(t._1, t._2);
+                    } else {
+                        return false;
+                    }
+                });
+            } else {
+                return false;
+            }
+        };
         return Cons;
     })();
     exports.Cons = Cons;
@@ -759,7 +824,7 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
 
     function padTo1(l, len, t) {
         if (l.length() < len) {
-            var rest = len - l.length();
+            var rest = len - l.length() - 1;
             var pad = new _range.Range(0, rest).toList().map(function (_) {
                 return t;
             });

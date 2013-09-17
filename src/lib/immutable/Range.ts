@@ -8,7 +8,7 @@ export class Range implements IRange {
     private range: number[] = [];
 
     constructor (from: number, to: number) {
-        for(var i=from; i<to; i++) {
+        for(var i=from; i<=to; i++) {
             this.range.push(i);
         }
     }

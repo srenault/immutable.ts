@@ -97,6 +97,8 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     get(n: number): T;
 
+    getOption(n: number): _option.IOption<T>;
+
     splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>>;
 
     count(f: (t: T) => boolean): number;
@@ -139,11 +141,19 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     lift(): (number) => _option.IOption<T>;
 
-    startsWith(that: IList<T>): boolean
+    startsWith(that: IList<T>): boolean;
 
-    startsWithAt(that: IList<T>, offset: number): boolean
+    startsWithAt(that: IList<T>, offset: number): boolean;
 
-    endsWith(that: IList<T>): boolean
+    endsWith(that: IList<T>): boolean;
+
+    indices(): _range.IRange;
+
+    isDefinedAt(n: number): boolean;
+
+    containsSlice(sub: IList<T>): boolean;
+
+    corresponds<U>(l: IList<U>, f: (a: T, b: U) => boolean): boolean;
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -314,6 +324,10 @@ export class Nil<T> implements IList<T> {
         throw new Exceptions.indexOutOfBounds(n.toString());
     }
 
+    getOption(n: number): _option.IOption<T> {
+        return this.lift()(n);
+    }
+
     splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>> {
         var emptyList = new Nil<T>();
         return new _tuple.Tuple2<IList<T>, IList<T>>(emptyList, emptyList);
@@ -400,6 +414,22 @@ export class Nil<T> implements IList<T> {
     }
 
     endsWith(that: IList<T>): boolean {
+        return false;
+    }
+
+    indices(): _range.IRange {
+        return new _range.Range(0, 0);
+    }
+
+    isDefinedAt(n: number): boolean {
+        return false;
+    }
+
+    containsSlice(sub: IList<T>): boolean {
+        return false;
+    }
+
+    corresponds<U>(l: IList<U>, f: (a: T, b: U) => boolean): boolean {
         return false;
     }
 }
@@ -660,6 +690,10 @@ export class Cons<T> implements IList<T> {
         });
     }
 
+    getOption(n: number): _option.IOption<T> {
+        return this.lift()(n);
+    }
+
     splitAt(n: number): _tuple.Tuple2<IList<T>, IList<T>> {
         if(n > 0) {
             var z = new _tuple.Tuple2(new Nil<T>(), new Nil<T>());
@@ -823,6 +857,47 @@ export class Cons<T> implements IList<T> {
     endsWith(that: IList<T>): boolean {
         return this.reverse().startsWith(that.reverse());
     }
+
+    indices(): _range.IRange {
+        return new _range.Range(0, this.length() - 1);
+    }
+
+    isDefinedAt(n: number): boolean {
+        try {
+            return !!this.get(n);
+        } catch(e) {
+            return false;
+        }
+    }
+
+    containsSlice(sub: IList<T>): boolean {
+        var step = (l: IList<T>, sub: IList<T>): boolean => {
+            if(l.nonEmpty()) {
+                if(l.startsWith(sub)) {
+                    return true;
+                } else {
+                    return step(l.tail(), sub);
+                }
+            } else {
+                return false;
+            }
+        }
+        return step(this, sub);
+    }
+
+    corresponds<U>(l: IList<U>, f: (a: T, b: U) => boolean): boolean {
+        if(this.length() >= l.length()) {
+            return this.zip(l).foldLeft(true, (acc, t) => {
+                if(acc) {
+                    return f(t._1, t._2);
+                } else {
+                    return false;
+                }
+            });
+        } else {
+            return false;
+        }
+    }
 }
 
 function append1<T>(l1: IList<T>, l2: IList<T>): IList<T> {
@@ -863,7 +938,7 @@ function reverse1<T>(l: IList<T>): IList<T> {
 
 function padTo1<T>(l: IList<T>, len: number, t: T): IList<T> {
     if(l.length() < len) {
-        var rest = len - l.length();
+        var rest = len - l.length() - 1;
         var pad: IList<T> = new _range.Range(0, rest).toList().map<T>((_) => {
             return t;
         });

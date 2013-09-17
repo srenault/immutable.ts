@@ -373,6 +373,16 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
             });
         });
 
+        describe('getOption', function() {
+            it("should return None when n is defined in the List", function() {
+                expect(data.emptyList.getOption(4)).to.be.an.instanceof(None);
+            });
+
+            it("should return Some when n is defined in the List", function() {
+                expect(data.nonEmptyList.getOption(3)).to.be.an.instanceof(Some);
+            });
+        });
+
         describe('splitAt', function() {
             it("should split this List into two at a given position", function() {
                 var split = data.nonEmptyList.splitAt(2);
@@ -543,6 +553,34 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
         describe('endsWith', function() {
             it("should test whether this list ends with the given sequence", function() {
                 expect(data.nonEmptyList.endsWith(List(3,4))).to.be.true;
+            });
+        });
+
+        describe('indices', function() {
+            it("should produce the range of all indices of this List", function() {
+                var range = data.nonEmptyList.indices().toList().asArray();
+                expect(arrayEquals(range, [0,1,2,3])).to.be.true;
+            });
+        });
+
+        describe('isDefinedAt', function() {
+            it("should test whether this List contains given index", function() {
+                expect(data.nonEmptyList.isDefinedAt(4)).to.be.false;
+                expect(data.nonEmptyList.isDefinedAt(3)).to.be.true;
+            });
+        });
+
+        describe('containsSlice', function() {
+            it("should test whether this List contains a given sequence as a slice", function() {
+                expect(data.nonEmptyList.containsSlice(List(2,3))).to.be.true;
+            });
+        });
+
+        describe('corresponds', function() {
+            it("should test whether every element of this List relates to the corresponding element of another List by satisfying a test predicate", function() {
+                expect(data.nonEmptyList.corresponds(List(2,4,6,8), function(a, b) {
+                    return a == (b / 2);
+                })).to.be.true;
             });
         });
     });

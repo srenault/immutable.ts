@@ -313,6 +313,10 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         Nil.prototype.slice = function (from, until) {
             return this;
         };
+
+        Nil.prototype.patch = function (from, l, replaced) {
+            return l;
+        };
         return Nil;
     })();
     exports.Nil = Nil;
@@ -815,6 +819,29 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
                     return acc;
                 }
             }).reverse();
+        };
+
+        Cons.prototype.patch = function (from, l, replaced) {
+            var step = function (self, p, acc) {
+                return self.headOption().map(function (sh) {
+                    if (sh._2 >= from) {
+                        return p.headOption().map(function (ph) {
+                            return step(self.tail(), p.tail(), acc.appendOne(ph));
+                        }).getOrElse(function () {
+                            return step(self.tail(), p, acc.appendOne(sh._1));
+                        });
+                    } else {
+                        return step(self.tail(), p, acc.appendOne(sh._1));
+                    }
+                }).getOrElse(function () {
+                    return p.headOption().map(function (ph) {
+                        return step(self, p.tail(), acc.appendOne(ph));
+                    }).getOrElse(function () {
+                        return acc;
+                    });
+                });
+            };
+            return step(this.zipWithIndex(), l, new Nil());
         };
         return Cons;
     })();

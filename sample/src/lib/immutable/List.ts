@@ -158,6 +158,8 @@ export interface IList<T> extends _tr.ITraversable<T> {
     segmentLenght(f: (t: T) => boolean, from: number): number;
 
     slice(from: number, until: number): IList<T>;
+
+    patch(from: number, l: IList<T>, replaced: number): IList<T>;
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -443,6 +445,10 @@ export class Nil<T> implements IList<T> {
 
     slice(from: number, until: number): IList<T> {
         return this;
+    }
+
+    patch(from: number, l: IList<T>, replaced: number): IList<T> {
+        return l;
     }
 }
 
@@ -935,6 +941,29 @@ export class Cons<T> implements IList<T> {
                 return acc;
             }
         }).reverse();
+    }
+
+    patch(from: number, l: IList<T>, replaced: number): IList<T> {
+        var step = (self: IList<_tuple.Tuple2<T, number>>, p: IList<T>, acc: IList<T>): IList<T> => {
+            return self.headOption().map((sh) => {
+                if(sh._2 >= from) {
+                    return p.headOption().map((ph) => {
+                        return step(self.tail(), p.tail(), acc.appendOne(ph));
+                    }).getOrElse(() => {
+                        return step(self.tail(), p, acc.appendOne(sh._1));
+                    });
+                } else {
+                    return step(self.tail(), p, acc.appendOne(sh._1));
+                }
+            }).getOrElse(() => {
+                return p.headOption().map((ph) => {
+                    return step(self, p.tail(), acc.appendOne(ph));
+                }).getOrElse(() => {
+                    return acc;
+                });
+            });
+        }
+        return step(this.zipWithIndex(), l, new Nil<T>());
     }
 }
 

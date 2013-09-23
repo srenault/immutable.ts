@@ -1,29 +1,9 @@
-define(["require", "exports", './Traversable', './Option', './Tuple', './Range'], function(require, exports, _tr, _option, _tuple, _range) {
+define(["require", "exports", './Traversable', './Option', './Tuple', './Range', '../exceptions'], function(require, exports, _tr, _option, _tuple, _range, _exceptions) {
     
     
     
     
-
-    exports.Exceptions = (function () {
-        return {
-            noSuchElement: function (message) {
-                function NoSuchElementError() {
-                    this.name = "NoSuchElementError";
-                    this.message = message || "";
-                }
-                NoSuchElementError.prototype = Error.prototype;
-                throw new NoSuchElementError();
-            },
-            indexOutOfBounds: function (message) {
-                function IndexOutOfBoundsError() {
-                    this.name = "IndexOutOfBoundsError";
-                    this.message = message || "";
-                }
-                IndexOutOfBoundsError.prototype = Error.prototype;
-                throw new IndexOutOfBoundsError();
-            }
-        };
-    })();
+    
 
     function List() {
         var as = [];
@@ -43,11 +23,11 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         function Nil() {
         }
         Nil.prototype.head = function () {
-            throw new exports.Exceptions.noSuchElement("head of empty List");
+            throw new _exceptions.noSuchElement("head of empty List");
         };
 
         Nil.prototype.last = function () {
-            throw new exports.Exceptions.noSuchElement("last of empty List");
+            throw new _exceptions.noSuchElement("last of empty List");
         };
 
         Nil.prototype.headOption = function () {
@@ -83,7 +63,7 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         };
 
         Nil.prototype.reduceRight = function (f) {
-            throw new exports.Exceptions.noSuchElement("reduceRight of empty List");
+            throw new _exceptions.noSuchElement("reduceRight of empty List");
         };
 
         Nil.prototype.reduceRightOption = function (f) {
@@ -91,7 +71,7 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         };
 
         Nil.prototype.reduceLeft = function (f) {
-            throw new exports.Exceptions.noSuchElement("reduceLeft of empty List");
+            throw new _exceptions.noSuchElement("reduceLeft of empty List");
         };
 
         Nil.prototype.reduceLeftOption = function (f) {
@@ -170,7 +150,7 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         };
 
         Nil.prototype.init = function () {
-            throw new exports.Exceptions.noSuchElement("init of empty List");
+            throw new _exceptions.noSuchElement("init of empty List");
         };
 
         Nil.prototype.take = function (n) {
@@ -194,7 +174,7 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
         };
 
         Nil.prototype.get = function (n) {
-            throw new exports.Exceptions.indexOutOfBounds(n.toString());
+            throw new _exceptions.indexOutOfBounds(n.toString());
         };
 
         Nil.prototype.getOption = function (n) {
@@ -578,7 +558,7 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
                     return acc;
                 }
             }).getOrElse(function () {
-                throw new exports.Exceptions.indexOutOfBounds(n.toString());
+                throw new _exceptions.indexOutOfBounds(n.toString());
             });
         };
 
@@ -599,7 +579,7 @@ define(["require", "exports", './Traversable', './Option', './Tuple', './Range']
                     }
                 });
             } else {
-                throw new exports.Exceptions.indexOutOfBounds(n.toString());
+                throw new _exceptions.indexOutOfBounds(n.toString());
             }
         };
 

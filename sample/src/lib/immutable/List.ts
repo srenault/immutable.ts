@@ -2,27 +2,7 @@ import _tr = require('./Traversable');
 import _option = require('./Option');
 import _tuple = require('./Tuple');
 import _range = require('./Range');
-
-export var Exceptions = (function() {
-    return {
-        noSuchElement: function(message: string) {
-            function NoSuchElementError () {
-                this.name = "NoSuchElementError";
-                this.message = message || "";
-            }
-            NoSuchElementError.prototype = Error.prototype;
-            throw new NoSuchElementError();
-        },
-        indexOutOfBounds: function (message: string) {
-            function IndexOutOfBoundsError () {
-                this.name = "IndexOutOfBoundsError";
-                this.message = message || "";
-            }
-            IndexOutOfBoundsError.prototype = Error.prototype;
-            throw new IndexOutOfBoundsError();
-        }
-    };
-})();
+import _exceptions = require('../exceptions');
 
 export interface IList<T> extends _tr.ITraversable<T> {
     head(): T;
@@ -176,11 +156,11 @@ export class Nil<T> implements IList<T> {
     }
 
     head(): T {
-        throw new Exceptions.noSuchElement("head of empty List");
+        throw new _exceptions.noSuchElement("head of empty List");
     }
 
     last(): T {
-        throw new Exceptions.noSuchElement("last of empty List");
+        throw new _exceptions.noSuchElement("last of empty List");
     }
 
     headOption(): _option.IOption<T> {
@@ -216,7 +196,7 @@ export class Nil<T> implements IList<T> {
     }
 
     reduceRight<U> (f: (t: T, acc: U) => U): U {
-        throw new Exceptions.noSuchElement("reduceRight of empty List");
+        throw new _exceptions.noSuchElement("reduceRight of empty List");
     }
 
     reduceRightOption<U>(f: (t: T, acc: U) => U): _option.IOption<U> {
@@ -224,7 +204,7 @@ export class Nil<T> implements IList<T> {
     }
 
     reduceLeft<U> (f: (t: T, acc: U) => U): U {
-        throw new Exceptions.noSuchElement("reduceLeft of empty List");
+        throw new _exceptions.noSuchElement("reduceLeft of empty List");
     }
 
     reduceLeftOption<U>(f: (acc: U, t: T) => U): _option.IOption<U> {
@@ -303,7 +283,7 @@ export class Nil<T> implements IList<T> {
     }
 
     init(): IList<T> {
-        throw new Exceptions.noSuchElement("init of empty List");
+        throw new _exceptions.noSuchElement("init of empty List");
     }
 
     take(n: number): IList<T> {
@@ -327,7 +307,7 @@ export class Nil<T> implements IList<T> {
     }
 
     get(n: number): T {
-        throw new Exceptions.indexOutOfBounds(n.toString());
+        throw new _exceptions.indexOutOfBounds(n.toString());
     }
 
     getOption(n: number): _option.IOption<T> {
@@ -704,7 +684,7 @@ export class Cons<T> implements IList<T> {
                 return acc;
             }
         }).getOrElse(() => {
-            throw new Exceptions.indexOutOfBounds(n.toString());
+            throw new _exceptions.indexOutOfBounds(n.toString());
         });
     }
 
@@ -725,7 +705,7 @@ export class Cons<T> implements IList<T> {
                 }
             });
         } else {
-            throw new Exceptions.indexOutOfBounds(n.toString());
+            throw new _exceptions.indexOutOfBounds(n.toString());
         }
     }
 

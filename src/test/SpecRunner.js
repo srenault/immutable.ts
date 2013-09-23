@@ -5,18 +5,18 @@ require.config({
 // Require libraries
 require(['require', 'vendor/chai', 'vendor/mocha'], function(require,chai){
 
-  // Chai
-  assert = chai.assert;
-  should = chai.should();
-  expect = chai.expect;
+    // Chai
+    assert = chai.assert;
+    should = chai.should();
+    expect = chai.expect;
 
-  // Mocha
-  mocha.setup('bdd');
+    // Mocha
+    mocha.setup('bdd');
 
-  // Require base tests before starting
-  require(['spec/List'], function(person){
-    // Start runner
-    mocha.run();
-  });
+    // Require base tests before starting
+    require(['spec/Option', 'spec/List'], function(person){
+        // Start runner
+        mocha.run();
+    });
 
 });

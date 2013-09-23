@@ -1,13 +1,20 @@
 import _tr = require('./Traversable');
+import _exceptions = require('../exceptions');
 
 export interface IOption<T> extends _tr.ITraversable<T> {
     get(): T;
-    getOrElse(f: () => any): any;
+    orElse<U>(f: () => IOption<U>);
+    orNull(): T;
+    getOrElse<U>(f: () => U): U;
     isEmpty(): boolean;
+    nonEmpty(): boolean;
     map<U>(f: (t: T) => U): IOption<U>;
     flatMap<U>(f: (t: T) => IOption<U>): IOption<U>;
-    filter<U>(f: (t: T) => boolean): IOption<T>;
+    filter(f: (t: T) => boolean): IOption<T>;
+    filterNot(f: (t: T) => boolean): IOption<T>;
     isDefined(): boolean;
+    flatten<U>(): IOption<U>;
+    exists(f: (t: T)=> boolean): boolean;
 }
 
 export function Option<T>(a: any): IOption<T> {
@@ -26,12 +33,24 @@ export class Some<T> implements IOption<T> {
         return this.t;
     }
 
-    getOrElse(f: () => any): any {
+    getOrElse<U>(f: () => U): U {
+        return <U><any>this.get();
+    }
+
+    orElse<U>(f: () => IOption<U>): IOption<U> {
+        return <IOption<U>><any>this;
+    }
+
+    orNull(): T {
         return this.get();
     }
 
     isEmpty(): boolean {
         return false;
+    }
+
+    nonEmpty(): boolean {
+        return !this.isEmpty();
     }
 
     map<U>(f: (t: T) => U): IOption<U> {
@@ -42,7 +61,18 @@ export class Some<T> implements IOption<T> {
         return f(this.get())
     }
 
-    filter<U>(f: (t: T) => boolean): IOption<T> {
+    flatten<U>(): IOption<U> {
+        var self = this;
+        return this.flatMap((t) => {
+            if(_tr.isOption(t)) {
+                return t;
+            } else {
+                return new Some(self.get);
+            }
+        });
+    }
+
+    filter(f: (t: T) => boolean): IOption<T> {
         if(f(this.get())) {
             return this;
         } else {
@@ -50,8 +80,18 @@ export class Some<T> implements IOption<T> {
         }
     }
 
+    filterNot(f: (t: T) => boolean): IOption<T> {
+        return this.filter((t) => {
+            return !f(t);
+        });
+    }
+
     isDefined(): boolean {
         return !this.isEmpty();
+    }
+
+    exists(f: (t: T) => boolean): boolean {
+        return this.filter(f).isDefined();
     }
 }
 
@@ -60,15 +100,27 @@ export class None<T> implements IOption<T> {
     }
 
     get(): T {
-        throw new Error("get on empty value");
+        throw new _exceptions.noSuchElement("None.get");
     }
 
-    getOrElse(f: () => any): any {
+    getOrElse<U>(f: () => U): U {
         return f();
+    }
+
+    orElse<U>(f: () => IOption<U>): IOption<U> {
+        return f();
+    }
+
+    orNull(): T {
+        return null;
     }
 
     isEmpty(): boolean {
         return true;
+    }
+
+    nonEmpty(): boolean {
+        return !this.isEmpty();
     }
 
     map<U>(f: (t: T) => U): IOption<U> {
@@ -79,11 +131,23 @@ export class None<T> implements IOption<T> {
         return new None<U>();
     }
 
-    filter<U>(f: (t: T) => boolean): IOption<T> {
+    flatten<U>(): IOption<U> {
+        return new None<U>();
+    }
+
+    filter(f: (t: T) => boolean): IOption<T> {
+        return this;
+    }
+
+    filterNot(f: (t: T) => boolean): IOption<T> {
         return this;
     }
 
     isDefined(): boolean {
         return !this.isEmpty();
+    }
+
+    exists(f: (t: T) => boolean): boolean {
+        return false;
     }
 }

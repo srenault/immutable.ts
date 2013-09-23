@@ -1,8 +1,7 @@
-define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],function(_list, _option, _tuple) {
+define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple', 'lib/exceptions'],function(_list, _option, _tuple, _exceptions) {
     var Nil = _list.Nil,
         List = _list.List,
         Cons = _list.Cons,
-        Exceptions = _list.Exceptions,
         Option = _option.Option,
         None = _option.None,
         Some = _option.Some,
@@ -28,7 +27,7 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
 
         describe('head', function() {
             it("should throw an NoSuchElementError on empty List", function() {
-                expect(data.emptyList.head).to.throw(Exceptions.NoSuchElementError);
+                expect(data.emptyList.head).to.throw(_exceptions.NoSuchElementError);
             });
 
             it("should return the first element on non-empty List", function() {
@@ -38,7 +37,7 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
 
         describe('last', function() {
             it("should throw an NoSuchElementError on empty List", function() {
-                expect(data.emptyList.last).to.throw(Exceptions.NoSuchElementError);
+                expect(data.emptyList.last).to.throw(_exceptions.NoSuchElementError);
             });
 
             it("should return the last element on non-empty List", function() {
@@ -151,7 +150,7 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
 
         describe('reduceLeft', function() {
             it("should throw NoSuchElementError on empty List", function() {
-                expect(data.emptyList.reduceLeft).to.throw(Exceptions.NoSuchElementError)
+                expect(data.emptyList.reduceLeft).to.throw(_exceptions.NoSuchElementError);
             });
 
             it("should reduces the elements of the List, going left to right", function() {
@@ -173,7 +172,7 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
 
         describe('reduceRight', function() {
             it("should throw NoSuchElementError on empty List", function() {
-                expect(data.emptyList.reduceRight).to.throw(Exceptions.NoSuchElementError)
+                expect(data.emptyList.reduceRight).to.throw(_exceptions.NoSuchElementError);
             });
 
             it("should reduces the elements of the List, going right to left", function() {
@@ -361,11 +360,11 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple'],fun
 
         describe('get', function() {
             it("should throw an NoSuchElementError on empty List", function() {
-                expect(data.emptyList.get).to.throw(Exceptions.NoSuchElementError);
+                expect(data.emptyList.get).to.throw(_exceptions.NoSuchElementError);
             });
 
             it("should throw an NoSuchElementError when index is out of bounds", function() {
-                expect(function() { return data.nonEmptyList.get(-1); }).to.throw(Exceptions.NoSuchElementError);
+                expect(function() { return data.nonEmptyList.get(-1); }).to.throw(_exceptions.NoSuchElementError);
             });
 
             it("should return the n element", function() {

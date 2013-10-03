@@ -2,3 +2,5 @@
 node_modules/
 js/*.js
 sample/javascripts
+src/lib/*.js
+src/lib/immutable/*.js

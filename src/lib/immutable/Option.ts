@@ -19,9 +19,9 @@ export interface IOption<T> extends _tr.ITraversable<T> {
 
 export function Option<T>(a: any): IOption<T> {
     if(a != null || a != undefined) {
-        return new Some<T>(a)
+        return new Some<T>(a);
     } else {
-        return new None<T>()
+        return new None<T>();
     }
 }
 

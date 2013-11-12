@@ -13,7 +13,7 @@ export interface IOption<T> extends _tr.ITraversable<T> {
     filter(f: (t: T) => boolean): IOption<T>;
     filterNot(f: (t: T) => boolean): IOption<T>;
     isDefined(): boolean;
-    flatten<U>(): IOption<U>;
+    //flatten<U>(): IOption<U>;
     exists(f: (t: T)=> boolean): boolean;
 }
 
@@ -61,16 +61,17 @@ export class Some<T> implements IOption<T> {
         return f(this.get())
     }
 
-    flatten<U>(): IOption<U> {
-        var self = this;
-        return this.flatMap((t) => {
-            if(_tr.isOption(t)) {
-                return t;
-            } else {
-                return new Some(self.get);
-            }
-        });
-    }
+    // flatten<U>(): IOption<U> {
+    //     //var self = this;
+    //     return this.flatMap<U>((t) => {
+    //         // if(_tr.isOption(t)) {
+    //         //     return <U><any>t;
+    //         // } else {
+    //         //     return new Some<U>(<U><any>self.get());
+    //         // }
+    //         return new None<U>();
+    //     });
+    // }
 
     filter(f: (t: T) => boolean): IOption<T> {
         if(f(this.get())) {
@@ -131,9 +132,9 @@ export class None<T> implements IOption<T> {
         return new None<U>();
     }
 
-    flatten<U>(): IOption<U> {
-        return new None<U>();
-    }
+    // flatten<U>(): IOption<U> {
+    //     return new None<U>();
+    // }
 
     filter(f: (t: T) => boolean): IOption<T> {
         return this;

@@ -203,7 +203,7 @@ export class Nil<T> implements IList<T> {
         return new _option.None<U>();
     }
 
-    reduceLeft<U> (f: (t: T, acc: U) => U): U {
+    reduceLeft<U> (f: (acc: U, t: T) => U): U {
         throw new _exceptions.noSuchElement("reduceLeft of empty List");
     }
 
@@ -445,11 +445,11 @@ export class Cons<T> implements IList<T> {
     }
 
     headOption(): _option.IOption<T> {
-        return _option.Option(this.hd);
+        return _option.Option<T>(this.hd);
     }
 
     lastOption(): _option.IOption<T> {
-        return _option.Option(this.last());
+        return _option.Option<T>(this.last());
     }
 
     tail(): IList<T> {
@@ -511,7 +511,7 @@ export class Cons<T> implements IList<T> {
     }
 
     map<U>(f: (t: T) => U): IList<U> {
-        return this.foldRight(new Nil<U>(), (t, acc) => {
+        return this.foldRight<IList<U>>(new Nil<U>(), (t, acc) => {
             return new Cons<U>(f(t), acc);
         });
     }
@@ -677,14 +677,15 @@ export class Cons<T> implements IList<T> {
     }
 
     get(n: number): T {
-        return this.zipWithIndex().foldLeft(new _option.None<T>(), (acc, t) => {
+        return this.zipWithIndex().foldLeft<_option.IOption<T>>(new _option.None<T>(), (acc, t) => {
             if(t._2 == n) {
-                return new _option.Some(t._1);
+                return new _option.Some<T>(t._1);
             } else {
                 return acc;
             }
         }).getOrElse(() => {
             throw new _exceptions.indexOutOfBounds(n.toString());
+            return null;
         });
     }
 
@@ -836,7 +837,7 @@ export class Cons<T> implements IList<T> {
     lift(): (number) => _option.IOption<T> {
         var self = this;
         return (n: number) => {
-            return _option.Option(self.get(n));
+            return _option.Option<T>(self.get(n));
         };
     }
 

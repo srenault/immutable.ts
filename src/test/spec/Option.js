@@ -96,16 +96,16 @@ define(['lib/immutable/Option', 'lib/exceptions'],function(_option, _exceptions)
             });
         });
 
-        describe('flatten', function() {
-            it("should convert this Option into a option formed by the elements of these Options", function() {
-                var flattenSome = Option(Option(3)).flatten();
-                expect(flattenSome).to.be.an.instanceof(Some);
-                expect(flattenSome).to.have.deep.property('t', 3);
+        // describe('flatten', function() {
+        //     it("should convert this Option into a option formed by the elements of these Options", function() {
+        //         var flattenSome = Option(Option(3)).flatten();
+        //         expect(flattenSome).to.be.an.instanceof(Some);
+        //         expect(flattenSome).to.have.deep.property('t', 3);
 
-                var flattenNone = Option(new None()).flatten();
-                expect(flattenNone).to.be.an.instanceof(None);
-            });
-        });
+        //         var flattenNone = Option(new None()).flatten();
+        //         expect(flattenNone).to.be.an.instanceof(None);
+        //     });
+        // });
 
         describe('exists', function() {
             it("should return true if this Option is nonempty and the predicate p returns true when applied to this Option's value", function() {

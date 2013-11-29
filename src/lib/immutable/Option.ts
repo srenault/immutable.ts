@@ -1,5 +1,5 @@
 import _tr = require('./Traversable');
-import _exceptions = require('../exceptions');
+import _exceptions = require('exceptions');
 
 export interface IOption<T> extends _tr.ITraversable<T> {
     get(): T;

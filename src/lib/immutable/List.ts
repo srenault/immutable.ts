@@ -2,7 +2,7 @@ import _tr = require('./Traversable');
 import _option = require('./Option');
 import _tuple = require('./Tuple');
 import _range = require('./Range');
-import _exceptions = require('exceptions');
+import _exceptions = require('./exceptions');
 
 export interface IList<T> extends _tr.ITraversable<T> {
     head(): T;

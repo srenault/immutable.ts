@@ -2,7 +2,7 @@ import _tr = require('./Traversable');
 import _option = require('./Option');
 import _tuple = require('./Tuple');
 import _range = require('./Range');
-import _exceptions = require('../exceptions');
+import _exceptions = require('./exceptions');
 
 export interface IList<T> extends _tr.ITraversable<T> {
     head(): T;
@@ -140,6 +140,8 @@ export interface IList<T> extends _tr.ITraversable<T> {
     slice(from: number, until: number): IList<T>;
 
     patch(from: number, l: IList<T>, replaced: number): IList<T>;
+
+    grouped(n: number): IList<IList<T>>;
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -430,6 +432,10 @@ export class Nil<T> implements IList<T> {
     patch(from: number, l: IList<T>, replaced: number): IList<T> {
         return l;
     }
+
+    grouped(n: number): IList<IList<T>> {
+        return new Nil<IList<T>>();
+    }
 }
 
 export class Cons<T> implements IList<T> {
@@ -601,7 +607,7 @@ export class Cons<T> implements IList<T> {
 
     mkString(sep: string): string {
         return this.foldLeft<string>("", (acc, t) => {
-            if(acc == "") return t;
+            if(acc == "") return t.toString();
             else return acc + sep + t;
         });
     }
@@ -945,6 +951,23 @@ export class Cons<T> implements IList<T> {
             });
         }
         return step(this.zipWithIndex(), l, new Nil<T>());
+    }
+
+    grouped(n: number): IList<IList<T>> {
+        var z = new Nil<IList<T>>();
+        return this.foldRight(z, (t, acc) => {
+            if(acc.isEmpty()) {
+                return acc.prependOne(new Cons<T>(t, new Nil<T>()));
+            } else {
+                var head = acc.head();
+                if(head.length() >= n) {
+                    return acc.prependOne(new Cons<T>(t, new Nil<T>()));
+                } else {
+                    var updated = head.prependOne(t);
+                    return acc.tail().prependOne(updated);
+                }
+            }
+        });
     }
 }
 

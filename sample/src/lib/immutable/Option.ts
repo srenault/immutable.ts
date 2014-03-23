@@ -1,5 +1,5 @@
 import _tr = require('./Traversable');
-import _exceptions = require('../exceptions');
+import _exceptions = require('./exceptions');
 
 export interface IOption<T> extends _tr.ITraversable<T> {
     get(): T;
@@ -10,6 +10,7 @@ export interface IOption<T> extends _tr.ITraversable<T> {
     nonEmpty(): boolean;
     map<U>(f: (t: T) => U): IOption<U>;
     flatMap<U>(f: (t: T) => IOption<U>): IOption<U>;
+    foreach(f: (t: T) => void): void;
     filter(f: (t: T) => boolean): IOption<T>;
     filterNot(f: (t: T) => boolean): IOption<T>;
     isDefined(): boolean;
@@ -72,6 +73,9 @@ export class Some<T> implements IOption<T> {
     //         return new None<U>();
     //     });
     // }
+    foreach(f: (t: T) => void): void {
+        f(this.get());
+    }
 
     filter(f: (t: T) => boolean): IOption<T> {
         if(f(this.get())) {
@@ -135,6 +139,10 @@ export class None<T> implements IOption<T> {
     // flatten<U>(): IOption<U> {
     //     return new None<U>();
     // }
+
+    foreach(f: (t: T) => void): void {
+        return null;
+    }
 
     filter(f: (t: T) => boolean): IOption<T> {
         return this;

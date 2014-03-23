@@ -1,4 +1,4 @@
-define(['lib/immutable/Option', 'lib/exceptions'],function(_option, _exceptions) {
+define(['lib/immutable/Option', 'lib/immutable/exceptions'],function(_option, _exceptions) {
 
     var Option = _option.Option,
         None = _option.None,

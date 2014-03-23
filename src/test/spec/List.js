@@ -1,4 +1,4 @@
-define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple', 'lib/exceptions'],function(_list, _option, _tuple, _exceptions) {
+define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple', 'lib/immutable/exceptions'],function(_list, _option, _tuple, _exceptions) {
     var Nil = _list.Nil,
         List = _list.List,
         Cons = _list.Cons,
@@ -602,6 +602,17 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple', 'li
             it("should produce a new List where a slice of elements in this list is replaced by another List", function() {
                 var isEquals = arrayEquals(data.nonEmptyList.patch(1,List(-1,-2), 2).asArray(), [1,-1,-2,4]);
                 expect(isEquals).to.be.true;
+            });
+        });
+
+        describe('grouped', function() {
+            it("should produce a new List of groups", function() {
+                var grouped = data.nonEmptyList.grouped(2).asArray().map(function(x) {
+                    return x.asArray();
+                });
+
+                expect(arrayEquals(grouped[0], [1, 2])).to.be.true;
+                expect(arrayEquals(grouped[1], [3, 4])).to.be.true;
             });
         });
     });

@@ -2,9 +2,9 @@
     "name": "typescript-fp",
     "version": "0.1.0",
     "devDependencies": {
-        "grunt": "~0.4.1",
-        "grunt-typescript": "~0.2.3",
-        "grunt-contrib-watch": "~0.5.2",
-        "grunt-contrib-copy": "~0.4.1"
+        "grunt": "latest",
+        "grunt-ts" : "latest",
+        "grunt-contrib-watch": "latest",
+        "grunt-contrib-copy": "latest"
     }
 }

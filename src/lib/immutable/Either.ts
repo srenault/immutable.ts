@@ -30,15 +30,7 @@ export class Left<T, U> implements IEither<T, U> {
     }
 
     fold<X>(ft: (t: T) => X, fu: (u: U) => X): X {
-        if(this instanceof Left) {
-            return ft(this.t);
-        } else {
-            throw new Error("Can't be a Right value !")
-        }
-    }
-
-    get(): T {
-        return this.t;
+        return ft(this.t);
     }
 }
 
@@ -64,15 +56,7 @@ export class Right<T, U> implements IEither<T, U> {
     }
 
     fold<X>(ft: (t: T) => X, fu: (u: U) => X): X {
-        if(this instanceof Right) {
-            return fu(this.u);
-        } else {
-            throw new Error("Can't be a Left value !")
-        }
-    }
-
-    get(): U {
-        return this.u;
+        return fu(this.u);
     }
 }
 

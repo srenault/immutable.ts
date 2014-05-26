@@ -7,7 +7,8 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple', 'li
         Some = _option.Some,
         data = {
             emptyList: new Nil(),
-            nonEmptyList: List(1,2,3,4)
+            nonEmptyList: List(1,2,3,4),
+            unsortedList: List({a: 6}, {a: 3}, {a: 4}, {a: 2}, {a: 1})
         };
 
     function arrayEquals (a1, b1) {
@@ -613,6 +614,18 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple', 'li
 
                 expect(arrayEquals(grouped[0], [1, 2])).to.be.true;
                 expect(arrayEquals(grouped[1], [3, 4])).to.be.true;
+            });
+        });
+
+     describe('sortBy', function() {
+            it("should sort the List", function() {
+                var sorted = data.unsortedList.sortBy(function(x) {
+                    return x.a;
+                }).asArray().map(function(x) {
+                    return x.a;
+                });
+
+                expect(arrayEquals(sorted, [1,2,3,4,6])).to.be.true;
             });
         });
     });

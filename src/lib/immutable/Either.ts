@@ -32,6 +32,14 @@ export class Left<T, U> implements IEither<T, U> {
     fold<X>(ft: (t: T) => X, fu: (u: U) => X): X {
         return ft(this.t);
     }
+
+    static map<X, T, U>(e: IEither<T, U>, f: (t: T) => X): IEither<X, U> {
+        return e.fold((t) => {
+            return new Left<X, U>(f(t));
+        }, () => {
+            return <IEither<X, U>><any> e;
+        });
+    }
 }
 
 export class Right<T, U> implements IEither<T, U> {
@@ -57,6 +65,14 @@ export class Right<T, U> implements IEither<T, U> {
 
     fold<X>(ft: (t: T) => X, fu: (u: U) => X): X {
         return fu(this.u);
+    }
+
+    static map<X, T, U>(e: IEither<T, U>, f: (u: U) => X): IEither<T, X> {
+        return e.fold((u) => {
+            return <IEither<T, X>><any> e;
+        }, (u) => {
+            return new Right<T, X>(f(u));
+        });
     }
 }
 

@@ -14,6 +14,6 @@ export class Range implements IRange {
     }
 
     toList<number>(): _list.IList<number> {
-        return _list.List.fromArray(this.range);
+        return _list.fromArray(this.range);
     }
 }

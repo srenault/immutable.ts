@@ -61,8 +61,6 @@ export interface IList<T> extends _tr.ITraversable<T> {
 
     reverse(): IList<T>;
 
-    fromArray(a: T[]): IList<T>;
-
     asArray(): T[];
 
     mkString(sep: string): string;
@@ -146,6 +144,10 @@ export interface IList<T> extends _tr.ITraversable<T> {
     grouped(n: number): IList<IList<T>>;
 
     sortBy<X>(f: (t: T) => X): IList<T>;
+}
+
+export function fromArray<T>(a: T[]): IList<T> {
+    return List.apply(null, a);
 }
 
 export function List<T>(...as: T[]): IList<T> {
@@ -270,10 +272,6 @@ export class Nil<T> implements IList<T> {
 
     reverse(): IList<T> {
         return this;
-    }
-
-    fromArray(a: T[]): IList<T> {
-        return List<T>();
     }
 
     asArray(): T[] {
@@ -608,10 +606,6 @@ export class Cons<T> implements IList<T> {
 
     reverse(): IList<T> {
         return reverse1(this);
-    }
-
-    fromArray(a: T[]): IList<T> {
-        return List.apply(null, a);
     }
 
     asArray(): T[] {

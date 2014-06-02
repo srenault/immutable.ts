@@ -8,7 +8,8 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple', 'li
         data = {
             emptyList: new Nil(),
             nonEmptyList: List(1,2,3,4),
-            unsortedList: List({a: 6}, {a: 3}, {a: 4}, {a: 2}, {a: 1})
+            unsortedList: List({a: 6}, {a: 3}, {a: 4}, {a: 2}, {a: 1}),
+            unsortedLettersList: List({a: 'c'}, {a: 'd'}, {a: 'a'}, {a: 'f'}, {a: 'b'})
         };
 
     function arrayEquals (a1, b1) {
@@ -619,13 +620,20 @@ define(['lib/immutable/List', 'lib/immutable/Option', 'lib/immutable/Tuple', 'li
 
      describe('sortBy', function() {
             it("should sort the List", function() {
-                var sorted = data.unsortedList.sortBy(function(x) {
+                var sortedNumbers = data.unsortedList.sortBy(function(x) {
                     return x.a;
                 }).asArray().map(function(x) {
                     return x.a;
                 });
 
-                expect(arrayEquals(sorted, [1,2,3,4,6])).to.be.true;
+                var sortedLetters = data.unsortedLettersList.sortBy(function(x) {
+                    return x.a;
+                }).asArray().map(function(x) {
+                    return x.a;
+                });
+
+                expect(arrayEquals(sortedNumbers, [1,2,3,4,6])).to.be.true;
+                expect(arrayEquals(sortedLetters, ['a','b','c','d','f'])).to.be.true;
             });
         });
     });

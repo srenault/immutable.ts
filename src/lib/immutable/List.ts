@@ -984,7 +984,7 @@ export class Cons<T> implements IList<T> {
         return List.apply(null, this.asArray().sort((a, b) => {
             var x = <number><any>f(a);
             var y = <number><any>f(b);
-            return x - y;
+            return (x < y) ? -1 : 1;
         }));
     }
 }

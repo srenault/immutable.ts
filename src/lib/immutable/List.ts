@@ -155,7 +155,11 @@ export function List<T>(...as: T[]): IList<T> {
         return new Nil<T>();
     } else {
         var tail = as.splice(1, as.length);
-        return new Cons<T>(as[0], List.apply(null, tail));
+        var s = new Cons<T>(as[0], new Nil<T>());
+        var list = tail.reduce((acc: IList<T>, el) => {
+            return acc.appendOne(el);
+        }, s);
+        return list;
     }
 }
 
@@ -220,7 +224,7 @@ export class Nil<T> implements IList<T> {
     }
 
     appendOne(t: T): IList<T> {
-        return List(t);
+        return new Cons<T>(t, new Nil<T>());
     }
 
     append(l: IList<T>): IList<T> {
@@ -511,7 +515,7 @@ export class Cons<T> implements IList<T> {
     }
 
     appendOne(t: T): IList<T> {
-        return append1(this, List(t));
+        return append1(this, new Cons<T>(t, new Nil<T>()));
     }
 
     append(l: IList<T>): IList<T> {
